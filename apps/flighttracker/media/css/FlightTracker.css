@@ -1,0 +1,24 @@
+﻿.header-area {
+  background-color: #356AA0;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  color: white;
+}
+.world {
+	background-image:url(../images/silk/icons/world.png) !important;
+}
+.printer {
+	background-image:url(../images/silk/icons/printer.png) !important;
+}
+.clock {
+	background-image:url(../images/silk/icons/clock.png) !important;
+}
+.email {
+	background-image:url(../images/silk/icons/email.png) !important;
+}
+.map {
+	background-image:url(../images/silk/icons/map.png) !important;
+}
+.sound {
+	background-image:url(../images/silk/icons/sound.png) !important;
+}

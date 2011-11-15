@@ -80,10 +80,6 @@
             div: Ext.get('scale-area').dom
         }));
 
-        var panZoombar = Ext.get(Ext.DomQuery.select('.olControlPanZoomBar')[0]);
-        panZoombar.setLeft('');
-        panZoombar.setRight('50px');
-
         this.map.events.register("zoomend", this, function (event) {
             var zoom = this.map.getZoom();
             Ext.get('zoom-level').dom.innerHTML = zoom;
