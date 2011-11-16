@@ -30,18 +30,21 @@
         this.noiseButton = Ext.create('Ext.panel.Panel', {
             frame: true,
             floating: true,
-            width: 32,
-            height: 32,
+            width: 40,
+            height: 40,
             layout: 'fit',
             items: [{
                 xtype: 'button',
-                iconCls: 'sound',
+                iconCls: 'icon-center sound',
+                iconAlign: 'top',
+                text: '',
+                scale: 'medium',
                 enableToggle: true,
                 toggleGroup: 'info-panel-controls',
                 toggleHandler: function (btn, state) {
                     if (state) {
                         this.infoPanel.show();
-                        this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-50, 10]);
+                        this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-60, 10]);
                         this.infoPanel.layout.setActiveItem(0);
                     } else {
                         this.infoPanel.hide();
@@ -54,18 +57,21 @@
         this.legendButton = Ext.create('Ext.panel.Panel', {
             frame: true,
             floating: true,
-            width: 32,
-            height: 32,
+            width: 40,
+            height: 40,
             layout: 'fit',
             items: [{
                 xtype: 'button',
-                iconCls: 'map',
+                iconCls: 'icon-center map',
+                iconAlign: 'top',
+                text: '',
+                scale: 'medium',
                 enableToggle: true,
                 toggleGroup: 'info-panel-controls',
                 toggleHandler: function (btn, state) {
                     if (state) {
                         this.infoPanel.show();
-                        this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-50, 10]);
+                        this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-60, 10]);
                         this.infoPanel.layout.setActiveItem(1);
                     } else {
                         this.infoPanel.hide();
@@ -108,7 +114,7 @@
                 'show': function () {
                     this.on({
                         'afterlayout': function () {
-                            this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-50, 10]);
+                            this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-60, 10]);
                         },
                         scope: this
                     });
@@ -124,7 +130,7 @@
                 this.legendButton.show();
                 this.on({
                     'afterlayout': function () {
-                        this.noiseButton.alignTo(this.mapPanel, 'tr-tr', [-10, 50]);
+                        this.noiseButton.alignTo(this.mapPanel, 'tr-tr', [-10, 60]);
                         this.legendButton.alignTo(this.mapPanel, 'tr-tr', [-10, 10]);
                     },
                     'activate': function () {

@@ -3,7 +3,7 @@
     alias: 'widgets.opennoms-widgets-appheader',
 
     id: 'app-header',
-    height: 60,
+    height: 64,
     region: 'north',
     layout: 'hbox',
     bodyCls: 'header-area',
@@ -27,7 +27,7 @@
         this.dockedItems = [{
             xtype: 'container',
             layout: 'hbox',
-            height: 35,
+            height: 37,
             items: [{
                 xtype: 'combo',
                 triggerCls: 'x-form-search-trigger',
@@ -53,40 +53,52 @@
                 xtype: 'container',
                 layout: 'hbox',
                 width: 200,
-                style: 'padding-top: 6px;',
+                style: 'padding-top: 2px;',
                 items: [{
                     xtype: 'button',
-                    iconCls: 'world',
+                    iconCls: 'icon-center world',
+                    iconAlign: 'top',
+                    text: '',
                     handler: function () {
                     },
-                    scope: this
+                    scope: this,
+                    scale: 'medium'
                 }, {
                     xtype: 'container',
                     width: 10
                 }, {
                     xtype: 'button',
-                    iconCls: 'clock',
+                    iconCls: 'icon-center clock',
+                    iconAlign: 'top',
+                    text: '',
                     handler: function () {
                     },
-                    scope: this
+                    scope: this,
+                    scale: 'medium'
                 }, {
                     xtype: 'container',
                     width: 10
                 }, {
                     xtype: 'button',
-                    iconCls: 'printer',
+                    iconCls: 'icon-center printer',
+                    iconAlign: 'top',
+                    text: '',
                     handler: function () {
                     },
-                    scope: this
+                    scope: this,
+                    scale: 'medium'
                 }, {
                     xtype: 'container',
                     width: 10
                 }, {
                     xtype: 'button',
-                    iconCls: 'email',
+                    iconCls: 'icon-center email',
+                    iconAlign: 'top',
+                    text: '',
                     handler: function () {
                     },
-                    scope: this
+                    scope: this,
+                    scale: 'medium'
                 }]
             }, {
                 xtype: 'container',

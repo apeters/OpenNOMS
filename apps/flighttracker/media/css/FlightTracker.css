@@ -22,3 +22,6 @@
 .sound {
 	background-image:url(../images/silk/icons/sound.png) !important;
 }
+.icon-center {
+  background-position: 50% 50%;
+}

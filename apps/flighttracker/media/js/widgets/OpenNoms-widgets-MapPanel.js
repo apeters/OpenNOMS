@@ -8,8 +8,8 @@
 
     initComponent: function () {
         this.map = new OpenLayers.Map('map', {
-            restrictedExtent: new OpenLayers.Bounds(-13262740.289971, 3966622.4652788, -13066450.001361, 4090756.1991966),
-            numZoomLevels: 11,
+            restrictedExtent: new OpenLayers.Bounds(-10470724.958188, 5549098.4316464, -10285900.22382, 5685003.4679186),
+            numZoomLevels: 10,
             fallThrough: false,
             controls: [new OpenLayers.Control.Navigation(), new OpenLayers.Control.PanZoomBar()],
             projection: new OpenLayers.Projection("EPSG:900913"),
@@ -35,9 +35,9 @@
         this.gmapsStreets = new OpenLayers.Layer.Google(
             "Streets", // the default
             {
-            numZoomLevels: 11,
+            numZoomLevels: 10,
             'sphericalMercator': true,
-            MIN_ZOOM_LEVEL: 9,
+            MIN_ZOOM_LEVEL: 10,
             projection: new OpenLayers.Projection("EPSG:900913")
         }
         );
@@ -45,9 +45,9 @@
             "Hybrid",
             {
                 type: google.maps.MapTypeId.HYBRID,
-                numZoomLevels: 11,
+                numZoomLevels: 10,
                 'sphericalMercator': true,
-                MIN_ZOOM_LEVEL: 9,
+                MIN_ZOOM_LEVEL: 10,
                 projection: new OpenLayers.Projection("EPSG:900913")
             }
         );
@@ -55,9 +55,9 @@
             "Aerial",
             {
                 type: google.maps.MapTypeId.SATELLITE,
-                numZoomLevels: 11,
+                numZoomLevels: 10,
                 'sphericalMercator': true,
-                MIN_ZOOM_LEVEL: 9,
+                MIN_ZOOM_LEVEL: 10,
                 projection: new OpenLayers.Projection("EPSG:900913")
             }
         );
