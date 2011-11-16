@@ -1,33 +1,42 @@
 ﻿Ext.define('OpenNoms.widgets.AppHeader', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.container.Container',
     alias: 'widgets.opennoms-widgets-appheader',
 
     id: 'app-header',
-    height: 64,
+    height: 72,
     region: 'north',
-    layout: 'hbox',
-    bodyCls: 'header-area',
+    layout: {
+        type: 'vbox',
+        align: 'stretch'
+    },
     border: false,
-    bodyStyle: 'padding: 0px 3px 8px 8px;',
+
 
     initComponent: function () {
         this.items = [{
-            xtype: 'container',
-            layout: 'fit',
-            style: 'padding-left:65px;',
-            html: '<div style="font-size:18px;font-weight:bold;">MAC Flight Tracker</div>',
-            flex: 1
+            xtype: 'panel',
+            layout: 'hbox',
+            bodyCls: 'header-area',
+            border: false,
+            bodyStyle: 'padding: 2px 3px 8px 8px;',
+            height: 34,
+            items: [{
+                xtype: 'container',
+                layout: 'fit',
+                style: 'padding-left:71px;',
+                html: '<div style="font-size:18px;font-weight:bold;padding-top:3px;">MAC Flight Tracker</div>',
+                flex: 1
+            }, {
+                xtype: 'container',
+                layout: 'fit',
+                html: '<a href="#" style="color: white;">Feedback</a><a style="padding-left: 10px; color: white;" href="#">Help</a>',
+                width: 100,
+                style: 'padding-right:10px;padding-top: 5px;'
+            }],
         }, {
             xtype: 'container',
-            layout: 'fit',
-            html: '<a href="#" style="color: white;">Feedback</a><a style="padding-left: 10px; color: white;" href="#">Help</a>',
-            width: 100,
-            style: 'padding-right:10px;padding-top: 5px;'
-        }];
-        this.dockedItems = [{
-            xtype: 'container',
             layout: 'hbox',
-            height: 37,
+            height: 38,
             items: [{
                 xtype: 'combo',
                 triggerCls: 'x-form-search-trigger',
@@ -45,7 +54,7 @@
                 valueField: 'id',
                 emptyText: 'Find an Address',
                 width: 425,
-                style: 'padding-left: 70px; padding-top: 6px;'
+                style: 'padding-left: 76px; padding-top: 8px;'
             }, {
                 xtype: 'container',
                 flex: 1
@@ -59,7 +68,19 @@
                     iconCls: 'icon-center world',
                     iconAlign: 'top',
                     text: '',
-                    handler: function () {
+                    enableToggle: true,
+                    toggleGroup: 'expanded-header-controls',
+                    toggleHandler: function (btn, state) {
+                        if (state) {
+                            if (this.getHeight != 200) {
+                                this.setHeight(200);
+                            } 
+                            Ext.getCmp('expanded-header-area').layout.setActiveItem(0);
+                        } else {
+                            if (this.getHeight != 72) {
+                                this.setHeight(72);
+                            }
+                        }
                     },
                     scope: this,
                     scale: 'medium'
@@ -71,7 +92,19 @@
                     iconCls: 'icon-center clock',
                     iconAlign: 'top',
                     text: '',
-                    handler: function () {
+                    enableToggle: true,
+                    toggleGroup: 'expanded-header-controls',
+                    toggleHandler: function (btn, state) {
+                        if (state) {
+                            if (this.getHeight != 200) {
+                                this.setHeight(200);
+                            } 
+                            Ext.getCmp('expanded-header-area').layout.setActiveItem(1);
+                        } else {
+                            if (this.getHeight != 72) {
+                                this.setHeight(72);
+                            }
+                        }
                     },
                     scope: this,
                     scale: 'medium'
@@ -103,17 +136,28 @@
             }, {
                 xtype: 'container',
                 width: 80
-            }],
-            dock: 'bottom'
+            }]
+        },{
+            xtype: 'panel', 
+            id: 'expanded-header-area',
+            height: 128,
+            layout: 'card',
+            items: [{ 
+                xtype: 'panel',
+                title: 'Flights...'
+            },{ 
+                xtype: 'panel',
+                title: 'Time...'
+            }]
         }];
 
         this.callParent(arguments);
 
         this.logo = Ext.create('Ext.container.Container', {
             layout: 'fit',
-            html: '<div style="text-align:center;padding-top:15px;height:50px;background-color:white;color:black;border:1px solid black">{logo}</div>',
-            width: 60,
-            height: 50,
+            cls: 'header-logo',
+            width: 64,
+            height: 64,
             floating: true,
             shadow: false,
             x: 5,

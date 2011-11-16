@@ -4,6 +4,11 @@
   background-repeat: no-repeat;
   color: white;
 }
+.header-logo {
+  background-image: url(../images/mac_logo_v3.png);
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
 .world {
 	background-image:url(../images/silk/icons/world.png) !important;
 }
