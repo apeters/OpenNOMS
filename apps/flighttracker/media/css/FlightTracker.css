@@ -27,6 +27,12 @@
 .sound {
 	background-image:url(../images/silk/icons/sound.png) !important;
 }
+.ruler {
+	background-image:url(../images/geosilk/ruler.png) !important;
+}
+.rulersquare {
+	background-image:url(../images/geosilk/ruler_square.png) !important;
+}
 .icon-center {
   background-position: 50% 50%;
 }

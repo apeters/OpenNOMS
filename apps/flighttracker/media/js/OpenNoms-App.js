@@ -17,14 +17,11 @@ OpenNoms.app = {
     * setup all visual components
     */
     buildUI: function () {
-        //this.splashPanel = Ext.create('OpenNoms.widgets.SplashPanel');
-
         this.appPanel = Ext.create('OpenNoms.widgets.AppPanel');
 
         this.viewport = new Ext.Viewport({
             layout: 'card',
             items: [
-                //this.splashPanel,
                 this.appPanel
             ]
         });
@@ -34,22 +31,53 @@ OpenNoms.app = {
     * setup all the listeners
     */
     applyListeners: function () {
-//        this.splashPanel.on({
-//            'loginstart': function () {
-//                this.loadingMask = Ext.Msg.wait('Signing In...');
-//            },
-//            'logincomplete': function () {
-//                this.loadingMask.hide();
-//                this.showApp();
-//            },
-//            'requestaccountclicked': function () {
-//                Ext.Msg.alert('Under Construction...', 'This feature is coming soon!');
-//            },
-//            'exploreclicked': function () {
-//                this.showApp();
-//            },
-//            scope: this
-//        });
+        this.appPanel.appHeader.on({
+            'measureclicked': function (mode, state) {
+                this.appPanel.mapPanel.drawDistanceMeasureControl.deactivate();
+                this.appPanel.mapPanel.drawAreaMeasureControl.deactivate();
+                if (state) {
+                    this.appPanel.mapPanel.measureLayer.removeAllFeatures();
+                    this.appPanel.measureFeedbackPanel.hide();
+                    if (mode == 'area') {
+                        this.appPanel.mapPanel.drawAreaMeasureControl.activate();
+                    } else if (mode == 'distance') {
+                        this.appPanel.mapPanel.drawDistanceMeasureControl.activate();
+                    }
+                }
+            },
+            scope: this
+        });
+
+        this.appPanel.mapPanel.on({
+            'distancemeasurecomplete': function (feature) {
+                var measure = feature.geometry.getLength().toFixed(3) + ' ' + this.appPanel.mapPanel.map.getUnits();
+                this.appPanel.mapPanel.drawDistanceMeasureControl.deactivate();
+                this.appPanel.measureFeedbackPanel.show();
+                this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [60, 10]);
+                Ext.get('measure-read-out').dom.innerHTML = measure;
+                Ext.getCmp('measure-button').toggle(false);
+            },
+            'areameasurecomplete': function (feature) {
+                var measure = feature.geometry.getArea().toFixed(3) + ' sq ' + this.appPanel.mapPanel.map.getUnits();
+                this.appPanel.mapPanel.drawAreaMeasureControl.deactivate();
+                this.appPanel.measureFeedbackPanel.show();
+                this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [60, 10]);
+                Ext.get('measure-read-out').dom.innerHTML = measure;
+                Ext.getCmp('measure-button').toggle(false);
+            },
+            scope: this
+        });
+
+        this.appPanel.on({
+            'clearmeasureclicked': function (feature) {
+                this.appPanel.measureFeedbackPanel.hide();
+                this.appPanel.mapPanel.measureLayer.removeAllFeatures();
+            },
+            'afterlayout': function () {
+                this.appPanel.mapPanel.map.updateSize();
+            },
+            scope: this
+        });
     },
 
     /*

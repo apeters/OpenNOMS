@@ -6,6 +6,10 @@
     id: 'app-panel',
 
     initComponent: function () {
+        this.addEvents({
+            'clearmeasureclicked': true
+        });
+
         this.mapPanel = new OpenNoms.widgets.MapPanel();
         this.appHeader = new OpenNoms.widgets.AppHeader();
 
@@ -115,6 +119,43 @@
                     this.on({
                         'afterlayout': function () {
                             this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-60, 10]);
+                        },
+                        scope: this
+                    });
+                },
+                scope: this,
+                single: true
+            }
+        });
+
+        this.measureFeedbackPanel = Ext.create('Ext.panel.Panel', {
+            frame: true,
+            floating: true,
+            width: 200,
+            height: 80,
+            layout: {
+                type: 'vbox',
+                padding: '5',
+                align: 'stretch'
+            },
+            items: [{
+                xtype: 'container',
+                height: 35,
+                html: '<div style="font-weight:bold;">Current Measurement: </div><div id="measure-read-out"></div>'
+            }, {
+                xtype: 'button',
+                text: 'Clear Measurement',
+                height: 25,
+                handler: function () {
+                    this.fireEvent('clearmeasureclicked');
+                },
+                scope: this
+            }],
+            listeners: {
+                'show': function () {
+                    this.on({
+                        'afterlayout': function () {
+                            this.measureFeedbackPanel.alignTo(this.mapPanel, 'tl-tl', [70, 10]);
                         },
                         scope: this
                     });

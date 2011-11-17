@@ -13,6 +13,10 @@
 
 
     initComponent: function () {
+        this.addEvents({
+            'measureclicked': true
+        });
+
         this.items = [{
             xtype: 'panel',
             layout: 'hbox',
@@ -61,7 +65,7 @@
             }, {
                 xtype: 'container',
                 layout: 'hbox',
-                width: 200,
+                width: 220,
                 style: 'padding-top: 2px;',
                 items: [{
                     xtype: 'button',
@@ -74,11 +78,13 @@
                         if (state) {
                             if (this.getHeight != 200) {
                                 this.setHeight(200);
+                                this.fireEvent('headerresized');
                             } 
                             Ext.getCmp('expanded-header-area').layout.setActiveItem(0);
                         } else {
                             if (this.getHeight != 72) {
                                 this.setHeight(72);
+                                this.fireEvent('headerresized');
                             }
                         }
                     },
@@ -98,11 +104,13 @@
                         if (state) {
                             if (this.getHeight != 200) {
                                 this.setHeight(200);
+                                this.fireEvent('headerresized');
                             } 
                             Ext.getCmp('expanded-header-area').layout.setActiveItem(1);
                         } else {
                             if (this.getHeight != 72) {
                                 this.setHeight(72);
+                                this.fireEvent('headerresized');
                             }
                         }
                     },
@@ -132,10 +140,48 @@
                     },
                     scope: this,
                     scale: 'medium'
-                }]
+                }, {
+                    xtype: 'container',
+                    width: 10
+                },{
+                    xtype: 'splitbutton',
+                    id: 'measure-button',
+                    iconCls: 'icon-center ruler',
+                    iconAlign: 'top',
+                    text: '',
+                    enableToggle: true,
+                    toggleHandler: function (btn, state) {
+                        var mode = 'distance';
+                        if (Ext.getCmp('measure-button').iconCls == 'icon-center rulersquare') {
+                            mode = 'area';
+                        }
+                        this.fireEvent('measureclicked', mode, state);
+                    },
+                    scope: this,
+                    menu: [{
+                        text: 'Distance',
+                        iconCls: 'ruler',
+                        handler: function () {
+                            Ext.getCmp('measure-button').setIconCls('icon-center ruler');
+                            Ext.getCmp('measure-button').toggle(true);
+                        },
+                        scope: this
+                    },{
+                        text: 'Area',
+                        iconCls: 'rulersquare',
+                        handler: function () {
+                            Ext.getCmp('measure-button').setIconCls('icon-center rulersquare');
+                            Ext.getCmp('measure-button').toggle(true);
+                        },
+                        scope: this
+                    }],
+                    arrowAlign: 'right',
+                    scope: this,
+                    scale: 'medium'
+                }, ]
             }, {
                 xtype: 'container',
-                width: 80
+                width: 120
             }]
         },{
             xtype: 'panel', 
@@ -144,7 +190,125 @@
             layout: 'card',
             items: [{ 
                 xtype: 'panel',
-                title: 'Flights...'
+                title: 'Select Flights',
+                layout: {
+                    type: 'vbox',
+                    padding: '5',
+                    align: 'stretch'
+                },
+                items: [{
+                    xtype: 'container',
+                    layout: {
+                        type: 'hbox',
+                        padding: '2',
+                        align: 'stretch'
+                    },
+                    height: 28,
+                    items: [{
+                        xtype: 'container',
+                        flex: 1
+                    },{
+                        xtype: 'button',
+                        text: 'Flight Types',
+                        width: 170,
+                        menu: {
+                            width: 170,
+                            defaults: {
+                                width: 164
+                            },
+                            items: [{
+                                text: 'item 1'
+                            }, {
+                                text: 'item 2'
+                            }, {
+                                text: 'item 2'
+                            }]
+                        }
+                    },{
+                        xtype: 'container',
+                        flex: 1
+                    },{
+                        xtype: 'button',
+                        text: 'Airlines',
+                        width: 170,
+                        menu: {
+                            width: 170,
+                            defaults: {
+                                width: 164
+                            },
+                            items: [{
+                                text: 'item 1'
+                            }, {
+                                text: 'item 2'
+                            }, {
+                                text: 'item 2'
+                            }]
+                        }
+                    },{
+                        xtype: 'container',
+                        flex: 1
+                    },{
+                        xtype: 'button',
+                        text: 'Airports',
+                        width: 170,
+                        menu: {
+                            width: 170,
+                            defaults: {
+                                width: 164
+                            },
+                            items: [{
+                                text: 'item 1'
+                            }, {
+                                text: 'item 2'
+                            }, {
+                                text: 'item 2'
+                            }]
+                        }
+                    },{
+                        xtype: 'container',
+                        flex: 1
+                    },{
+                        xtype: 'button',
+                        text: 'Display',
+                        width: 170,
+                        menu: {
+                            width: 170,
+                            defaults: {
+                                width: 164
+                            },
+                            items: [{
+                                text: 'item 1'
+                            }, {
+                                text: 'item 2'
+                            }, {
+                                text: 'item 2'
+                            }]
+                        }
+                    },{
+                        xtype: 'container',
+                        flex: 1
+                    }]
+                },{
+                    xtype: 'container',
+                    style: 'font-size:11px;',
+                    html: '<span style="font-weight:bold;">Flight Types: </span><span id="flight-types-list"></span>',
+                    height: 16
+                },{
+                    xtype: 'container',
+                    style: 'font-size:11px;',
+                    html: '<span style="font-weight:bold;">Airlines: </span><span id="airlines-list"></span>',
+                    height: 16
+                },{
+                    xtype: 'container',
+                    style: 'font-size:11px;',
+                    html: '<span style="font-weight:bold;">Airports: </span><span id="airports-list"></span>',
+                    height: 16
+                },{
+                    xtype: 'container',
+                    style: 'font-size:11px;',
+                    html: '<span style="font-weight:bold;">Readout: </span><span id="display-list"></span>',
+                    height: 16
+                }]
             },{ 
                 xtype: 'panel',
                 title: 'Time...'

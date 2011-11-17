@@ -7,6 +7,11 @@
     border: true,
 
     initComponent: function () {
+        this.addEvents({
+            'distancemeasurecomplete': true,
+            'areameasurecomplete': true
+        });
+
         this.map = new OpenLayers.Map('map', {
             restrictedExtent: new OpenLayers.Bounds(-10470724.958188, 5549098.4316464, -10285900.22382, 5685003.4679186),
             numZoomLevels: 10,
@@ -67,6 +72,55 @@
         this.map.updateSize();
 
         this.map.addLayers([this.gmapsStreets, this.gmapsHybrid, this.gmapsAerial]);
+
+        var measureStyle = OpenLayers.Util.applyDefaults({
+            strokeColor: "#808080",
+            strokeOpacity: 1,
+            strokeWidth: 3,
+            strokeDashstyle: 'dash',
+            fillOpacity: 0.1,
+            fillColor: "#808080",
+            pointRadius: 4,
+            graphicName: 'x'
+        }, OpenLayers.Feature.Vector.style["default"]);
+
+        this.measureLayer = new OpenLayers.Layer.Vector(
+            "MeasureLayer", {
+                style: measureStyle
+            }
+        );
+
+        this.map.addLayers([this.measureLayer]);
+
+        this.drawDistanceMeasureControl = new OpenLayers.Control.DrawFeature(this.measureLayer,
+            OpenLayers.Handler.Path, {
+                handlerOptions: {
+                    style: measureStyle
+                },
+                eventListeners: {
+                    "featureadded": function (e) {
+                        this.fireEvent('distancemeasurecomplete', e.feature);
+                    },
+                    scope: this
+                }
+            }
+        );
+
+        this.drawAreaMeasureControl = new OpenLayers.Control.DrawFeature(this.measureLayer,
+            OpenLayers.Handler.Polygon, {
+                handlerOptions: {
+                    style: measureStyle
+                },
+                eventListeners: {
+                    "featureadded": function (e) {
+                        this.fireEvent('areameasurecomplete', e.feature);
+                    },
+                    scope: this
+                }
+            }
+        );
+
+        this.map.addControls([this.drawAreaMeasureControl, this.drawDistanceMeasureControl]);
 
         this.map.zoomToMaxExtent();
 
