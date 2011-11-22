@@ -45,6 +45,9 @@ OpenNoms.app = {
                     }
                 }
             },
+            'headerresized': function () {
+                this.appPanel.mapPanel.map.baseLayer.redraw();
+            },
             scope: this
         });
 
@@ -53,7 +56,7 @@ OpenNoms.app = {
                 var measure = feature.geometry.getLength().toFixed(3) + ' ' + this.appPanel.mapPanel.map.getUnits();
                 this.appPanel.mapPanel.drawDistanceMeasureControl.deactivate();
                 this.appPanel.measureFeedbackPanel.show();
-                this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [60, 10]);
+                this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [70, 10]);
                 Ext.get('measure-read-out').dom.innerHTML = measure;
                 Ext.getCmp('measure-button').toggle(false);
             },
@@ -61,7 +64,7 @@ OpenNoms.app = {
                 var measure = feature.geometry.getArea().toFixed(3) + ' sq ' + this.appPanel.mapPanel.map.getUnits();
                 this.appPanel.mapPanel.drawAreaMeasureControl.deactivate();
                 this.appPanel.measureFeedbackPanel.show();
-                this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [60, 10]);
+                this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [70, 10]);
                 Ext.get('measure-read-out').dom.innerHTML = measure;
                 Ext.getCmp('measure-button').toggle(false);
             },
@@ -75,6 +78,7 @@ OpenNoms.app = {
             },
             'afterlayout': function () {
                 this.appPanel.mapPanel.map.updateSize();
+                this.appPanel.mapPanel.map.baseLayer.redraw();
             },
             scope: this
         });

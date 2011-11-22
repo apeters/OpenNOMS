@@ -40,7 +40,7 @@
         this.gmapsStreets = new OpenLayers.Layer.Google(
             "Streets", // the default
             {
-            numZoomLevels: 10,
+            numZoomLevels: 12,
             'sphericalMercator': true,
             MIN_ZOOM_LEVEL: 10,
             projection: new OpenLayers.Projection("EPSG:900913")
@@ -50,7 +50,7 @@
             "Hybrid",
             {
                 type: google.maps.MapTypeId.HYBRID,
-                numZoomLevels: 10,
+                numZoomLevels: 12,
                 'sphericalMercator': true,
                 MIN_ZOOM_LEVEL: 10,
                 projection: new OpenLayers.Projection("EPSG:900913")
@@ -60,7 +60,7 @@
             "Aerial",
             {
                 type: google.maps.MapTypeId.SATELLITE,
-                numZoomLevels: 10,
+                numZoomLevels: 12,
                 'sphericalMercator': true,
                 MIN_ZOOM_LEVEL: 10,
                 projection: new OpenLayers.Projection("EPSG:900913")
@@ -69,9 +69,10 @@
 
         this.zoomPanel = Ext.create('Ext.panel.Panel', {
             frame: true,
+            bodyStyle: 'padding-top:3px;padding-left:8px;',
             floating: true,
-            width: 33,
-            height: 180,
+            width: 49,
+            height: 200,
             layout: 'fit',
             items: [{
                 xtype: 'slider',
@@ -80,7 +81,7 @@
                 useTips: false,
                 vertical: true,
                 minValue: 0,
-                maxValue: 9,
+                maxValue: 11,
                 listeners: {
                     'change': function (cmp, value) {
                         this.map.zoomTo(value);
