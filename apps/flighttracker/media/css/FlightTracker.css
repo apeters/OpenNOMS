@@ -9,6 +9,10 @@
   background-position: 50% 50%;
   background-repeat: no-repeat;
 }
+.trans-blue{
+    background-image:url(../images/trans-blue.png) !important;
+    background-color: transparent;
+}
 .world {
 	background-image:url(../images/silk/icons/world.png) !important;
 }
@@ -32,6 +36,15 @@
 }
 .rulersquare {
 	background-image:url(../images/geosilk/ruler_square.png) !important;
+}
+.play {
+	background-image:url(../images/silk/icons/control_play.png) !important;
+}
+.pause {
+	background-image:url(../images/silk/icons/control_pause.png) !important;
+}
+.plane {
+	background-image:url(../images/plane.png) !important;
 }
 .icon-center {
   background-position: 50% 50%;

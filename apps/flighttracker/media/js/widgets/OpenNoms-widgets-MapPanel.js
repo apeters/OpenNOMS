@@ -16,7 +16,7 @@
             restrictedExtent: new OpenLayers.Bounds(-10470724.958188, 5549098.4316464, -10285900.22382, 5685003.4679186),
             numZoomLevels: 10,
             fallThrough: false,
-            controls: [new OpenLayers.Control.Navigation(), new OpenLayers.Control.PanZoomBar()],
+            controls: [new OpenLayers.Control.Navigation()],
             projection: new OpenLayers.Projection("EPSG:900913"),
             displayProjection: new OpenLayers.Projection("EPSG:4326"),
             maxExtent: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508.34)
@@ -40,7 +40,7 @@
         this.gmapsStreets = new OpenLayers.Layer.Google(
             "Streets", // the default
             {
-            numZoomLevels: 10,
+            numZoomLevels: 12,
             'sphericalMercator': true,
             MIN_ZOOM_LEVEL: 10,
             projection: new OpenLayers.Projection("EPSG:900913")
@@ -50,7 +50,7 @@
             "Hybrid",
             {
                 type: google.maps.MapTypeId.HYBRID,
-                numZoomLevels: 10,
+                numZoomLevels: 12,
                 'sphericalMercator': true,
                 MIN_ZOOM_LEVEL: 10,
                 projection: new OpenLayers.Projection("EPSG:900913")
@@ -60,12 +60,48 @@
             "Aerial",
             {
                 type: google.maps.MapTypeId.SATELLITE,
-                numZoomLevels: 10,
+                numZoomLevels: 12,
                 'sphericalMercator': true,
                 MIN_ZOOM_LEVEL: 10,
                 projection: new OpenLayers.Projection("EPSG:900913")
             }
         );
+
+        this.zoomPanel = Ext.create('Ext.panel.Panel', {
+            frame: true,
+            bodyStyle: 'padding-top:3px;padding-left:8px;',
+            floating: true,
+            width: 49,
+            height: 200,
+            layout: 'fit',
+            items: [{
+                xtype: 'slider',
+                id: 'zoom-slider',
+                hideLabel: true,
+                useTips: false,
+                vertical: true,
+                minValue: 0,
+                maxValue: 11,
+                listeners: {
+                    'change': function (cmp, value) {
+                        this.map.zoomTo(value);
+                    },
+                    scope: this
+                }
+            }]
+        });
+
+        this.zoomPanel.show();
+
+        this.on({
+            'afterlayout': function () {
+                this.zoomPanel.alignTo(this, 'tl-tl', [10, 10]);
+            },
+            scope: this
+        });
+
+        this.doLayout();
+
     },
 
     mapReady: function () {
@@ -137,6 +173,10 @@
         this.map.events.register("zoomend", this, function (event) {
             var zoom = this.map.getZoom();
             Ext.get('zoom-level').dom.innerHTML = zoom;
+            var zoomSlider = Ext.getCmp('zoom-slider');
+            if (zoomSlider.getValue() != zoom) {
+                zoomSlider.setValue(zoom);
+            }
             this.doLayout();
         });
 

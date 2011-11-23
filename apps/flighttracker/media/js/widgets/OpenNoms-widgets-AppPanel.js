@@ -40,6 +40,7 @@
             items: [{
                 xtype: 'button',
                 iconCls: 'icon-center sound',
+                tooltip: 'View Noise Events',
                 iconAlign: 'top',
                 text: '',
                 scale: 'medium',
@@ -67,6 +68,7 @@
             items: [{
                 xtype: 'button',
                 iconCls: 'icon-center map',
+                tooltip: 'View Legend',
                 iconAlign: 'top',
                 text: '',
                 scale: 'medium',
