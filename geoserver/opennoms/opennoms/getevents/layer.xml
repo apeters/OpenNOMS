@@ -1,0 +1,13 @@
+<layer>
+  <name>getevents</name>
+  <id>LayerInfoImpl--109f1036:133f19818ca:-7fff</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--109f1036:133f19818ca:-8000</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>
