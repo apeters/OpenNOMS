@@ -10,197 +10,98 @@
 }];
 
 Ext.define('OpenNoms.widgets.SelectFlights', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.grid.Panel',
     alias: 'widgets.opennoms-widgets-selectflights',
 
     id: 'select-flights',
     title: 'Select Flights',
-    layout: {
-        type: 'vbox',
-        padding: '5',
-        align: 'stretch'
-    },
 
     initComponent: function () {
-        this.items = [{
-            xtype: 'container',
-            layout: {
-                type: 'hbox',
-                padding: '2',
-                align: 'stretch'
+        var url = 'http://localhost:8080/geoserver/opennoms/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opennoms:advanced_query_choices&maxFeatures=50&outputFormat=json';
+        this.store = Ext.create('Ext.data.Store', {
+            fields: ['group', 'name', 'value', 'ischecked'],
+            groupField: 'group',
+            proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
+                url: url
+            }),
+            autoLoad: true
+        });
+
+        this.columns = [
+            { xtype: 'checkcolumn', header: '', dataIndex: 'ischecked', width: 56, listeners: {
+                'checkchange': function (column, recIndex, checked) {
+                    var record = this.store.getAt(recIndex);
+                    record.commit();
+                    //                    delete record.modified['ischecked'];
+                    //                    this.getView().refresh();
+                },
+                scope: this
+            }
             },
-            height: 28,
-            items: [{
-                xtype: 'container',
-                flex: 1
-            }, {
-                xtype: 'button',
-                text: 'Flight Types',
-                width: 170,
-                menu: {
-                    width: 170,
-                    defaults: {
-                        width: 164
-                    },
-                    items: this.flightTypeFactory(data)
-                }
-            }, {
-                xtype: 'container',
-                flex: 1
-            }, {
-                xtype: 'button',
-                text: 'Airlines',
-                width: 170,
-                menu: {
-                    width: 170,
-                    defaults: {
-                        width: 164
-                    },
-                    items: this.airlineFactory(data)
-                }
-            }, {
-                xtype: 'container',
-                flex: 1
-            }, {
-                xtype: 'button',
-                text: 'Airports',
-                width: 170,
-                menu: {
-                    width: 170,
-                    defaults: {
-                        width: 164
-                    },
-                    items: this.airportFactory(data)
-                }
-            }, {
-                xtype: 'container',
-                flex: 1
-            }, {
-                xtype: 'button',
-                text: 'Display',
-                width: 170,
-                menu: {
-                    width: 170,
-                    defaults: {
-                        width: 164
-                    },
-                    items: this.displayTypeFactory(data)
-                }
-            }, {
-                xtype: 'container',
-                flex: 1
-            }]
-        }, {
-            xtype: 'container',
-            style: 'font-size:11px;',
-            html: '<span style="font-weight:bold;">Flight Types: </span><span id="flight-types-list"></span>',
-            height: 16
-        }, {
-            xtype: 'container',
-            style: 'font-size:11px;',
-            html: '<span style="font-weight:bold;">Airlines: </span><span id="airlines-list"></span>',
-            height: 16
-        }, {
-            xtype: 'container',
-            style: 'font-size:11px;',
-            html: '<span style="font-weight:bold;">Airports: </span><span id="airports-list"></span>',
-            height: 16
-        }, {
-            xtype: 'container',
-            style: 'font-size:11px;',
-            html: '<span style="font-weight:bold;">Readout: </span><span id="display-list"></span>',
-            height: 16
-        }];
+            { header: 'Name', dataIndex: 'name', flex: 1 }
+        ];
+
+        this.features = [Ext.create('Ext.grid.feature.CheckGrouping', {
+            groupHeaderTpl: '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
+        })];
 
         this.callParent(arguments);
+    }
+});
+
+/**
+*/
+Ext.define('Ext.grid.feature.CheckGrouping', {
+    extend: 'Ext.grid.feature.Grouping',
+    requires: 'Ext',
+    alias: 'feature.brigrouping',
+
+    constructor: function () {
+        this.callParent(arguments);
+
+        this.groupHeaderTpl = ['<dl style="height:18px; border:0px !important" class="x-grid-row-checked">',
+             '<dd id="groupcheck{name}" class="x-grid-row-checker x-column-header-text" style="width:18px; float:left;" x-grid-group-hd-text="{text}">&nbsp;</dd>',
+             '<dd style="float:left; padding:3px 0px 0px 3px;">',
+             this.groupHeaderTpl,
+             '</dd>',
+             '</dl>'
+             ].join('');
     },
 
-    flightTypeFactory: function (data) {
-        var flightTypes = [{
-            text: 'All',
-            checked: false,
-            scope: this,
-            handler: function () {
-
-            }
-        }];
-
-        Ext.each(data, function (item, index, allItems) {
-            flightTypes.push({
-                text: item.name,
-                checked: false,
-                scope: this,
-                handler: function () {
-                    alert(item.name);
-                }
-            });
-        });
-
-        return flightTypes;
+    onGroupClick: function (view, node, group, e, options) {
+        var checkbox = Ext.get('groupcheck' + group);
+        if (this.inCheckbox(checkbox, e.getXY())) {
+            this.toggleCheckbox(group, node, view);
+        } else if (this.isLeftofCheckbox(checkbox, e.getXY())) {
+            this.callParent(arguments);
+        }
     },
 
-    airlineFactory: function (data) {
-        var airlines = [{
-            text: 'All',
-            checked: false,
-            scope: this,
-            handler: function () {
-
-            }
-        }];
-
-        Ext.each(data, function (item, index, allItems) {
-            airlines.push({
-                text: item.name,
-                checked: false,
-                scope: this,
-                handler: function () {
-
-                }
-            });
-        });
-
-        return airlines;
+    inCheckbox: function (checkbox, xy) {
+        var x = xy[0];
+        var y = xy[1];
+        if (x >= checkbox.getLeft() &&
+            x <= checkbox.getRight() &&
+            y >= checkbox.getTop() &&
+            y <= checkbox.getBottom()) {
+            return true;
+        }
+        return false;
     },
-
-    airportFactory: function (data) {
-        var airports = [{
-            text: 'All',
-            checked: false,
-            scope: this,
-            handler: function () {
-
-            }
-        }];
-
-        Ext.each(data, function (item, index, allItems) {
-            airports.push({
-                text: item.name,
-                checked: false,
-                scope: this,
-                handler: function () {
-
-                }
-            });
-        });
-
-        return airports;
+    isLeftofCheckbox: function (checkbox, xy) {
+        if (xy[0] < checkbox.getLeft()) {
+            return true;
+        }
+        return false;
     },
-
-    displayTypeFactory: function (data) {
-        var displayTypes = [];
-
-        Ext.each(data, function (item, index, allItems) {
-            displayTypes.push({
-                text: item.name,
-                checked: false,
-                scope: this,
-                handler: function () {
-
-                }
-            });
-        });
-
-        return displayTypes;
+    toggleCheckbox: function (group, node, view) {
+        var nodeEl = Ext.get(node).down('dl');
+        var classes = nodeEl.dom.classList;
+        if (!classes.contains('x-grid-row-checked')) {
+            nodeEl.addCls('x-grid-row-checked');
+        }
+        else {
+            nodeEl.removeCls('x-grid-row-checked');
+        }
     }
 });

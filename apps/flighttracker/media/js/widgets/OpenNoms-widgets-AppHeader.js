@@ -75,33 +75,33 @@
                 width: 220,
                 style: 'padding-top: 2px;',
                 items: [{
-                    xtype: 'button',
-                    iconCls: 'icon-center plane',
-                    tooltip: 'Select Flights',
-                    iconAlign: 'top',
-                    text: '',
-                    enableToggle: true,
-                    toggleGroup: 'expanded-header-controls',
-                    toggleHandler: function (btn, state) {
-                        if (state) {
-                            if (this.getHeight != this.tallHeight) {
-                                this.setHeight(this.tallHeight);
-                                this.fireEvent('headerresized');
-                            } 
-                            Ext.getCmp('expanded-header-area').layout.setActiveItem(0);
-                        } else {
-                            if (this.getHeight != this.smallHeight) {
-                                this.setHeight(this.smallHeight);
-                                this.fireEvent('headerresized');
-                            }
-                        }
-                    },
-                    scope: this,
-                    scale: 'medium'
-                }, {
-                    xtype: 'container',
-                    width: 10
-                }, {
+//                    xtype: 'button',
+//                    iconCls: 'icon-center plane',
+//                    tooltip: 'Select Flights',
+//                    iconAlign: 'top',
+//                    text: '',
+//                    enableToggle: true,
+//                    toggleGroup: 'expanded-header-controls',
+//                    toggleHandler: function (btn, state) {
+//                        if (state) {
+//                            if (this.getHeight != this.tallHeight) {
+//                                this.setHeight(this.tallHeight);
+//                                this.fireEvent('headerresized');
+//                            } 
+//                            Ext.getCmp('expanded-header-area').layout.setActiveItem(0);
+//                        } else {
+//                            if (this.getHeight != this.smallHeight) {
+//                                this.setHeight(this.smallHeight);
+//                                this.fireEvent('headerresized');
+//                            }
+//                        }
+//                    },
+//                    scope: this,
+//                    scale: 'medium'
+//                }, {
+//                    xtype: 'container',
+//                    width: 10
+//                }, {
 //                    xtype: 'button',
 //                    iconCls: 'icon-center clock',
 //                    iconAlign: 'top',
@@ -189,10 +189,7 @@
                     arrowAlign: 'right',
                     scope: this,
                     scale: 'medium'
-                }, ]
-            }, {
-                xtype: 'container',
-                width: 120
+                }]
             }]
         }, {
             xtype: 'toolbar',
@@ -200,6 +197,7 @@
             items: [{
                 xtype: 'button',
                 id: 'flight-track-type-menu',
+                tooltip: 'Select flight track display type',
                 style: 'font-weight: bold;',
                 text: '<span style="font-weight:bold;">Static Flight Tracks</span>',
                 width: 200,
@@ -210,18 +208,21 @@
                     },
                     items: [{
                         text: 'Static Flight Tracks',
+                        iconCls: 'lineblue',
                         handler: function () {
                             this.setFlightTrackToolbarState('static');
                         },
                         scope: this
                     }, {
                         text: 'Real Time Flight Track Replay',
+                        iconCls: 'clockgo',
                         handler: function () {
                             this.setFlightTrackToolbarState('realtime');
                         },
                         scope: this
                     }, {
                         text: 'Animated Flight Track Replay',
+                        iconCls: 'coggo',
                         handler: function () {
                             this.setFlightTrackToolbarState('animated');
                         },
@@ -265,7 +266,7 @@
                 labelAlign: 'right',
                 width: 160,
                 minValue: '12:00 AM',
-                maxValue: '11:30 PM',
+                maxValue: '11:55 PM',
                 value: '1:00 PM',
                 increment: 5
             },{
@@ -304,6 +305,17 @@
                 displayField: 'text',
                 valueField: 'length'
             },{
+                xtype: 'multislider',
+                id: 'staticslider',
+                flex: 1,
+                minValue: 0,
+                hideLabel: false,
+                useTips: false,
+                maxValue: 1440,
+                values: [0,10],
+                increment: 5,
+                style: 'margin-left: 15px;margin-right: 15px;'
+            },{
                 xtype: 'combo',
                 id: 'animationspeedcombo',
                 name: 'animationspeed',
@@ -328,22 +340,32 @@
                 displayField: 'text',
                 valueField: 'multiplier'
             },{
+                xtype: 'slider',
+                id: 'animationslider',
+                flex: 1,
+                minValue: 0,
+                hideLabel: false,
+                useTips: false,
+                maxValue: 100,
+                style: 'margin-left: 15px;margin-right: 15px;',
+                hidden: true
+            },{
                 xtype: 'container',
                 id: 'realtimemessage',
                 html: '(Flight display is delayed by 15 minutes.)',
                 style: 'padding-left: 5px;',
                 hidden: true
             }]
-        },{
-            xtype: 'panel', 
-            id: 'expanded-header-area',
-            border: false,
-            height: 128,
-            layout: 'card',
-            items: [Ext.create('OpenNoms.widgets.SelectFlights'),{ 
-                xtype: 'panel',
-                title: 'Time...'
-            }]
+//        },{
+//            xtype: 'panel', 
+//            id: 'expanded-header-area',
+//            border: false,
+//            height: 128,
+//            layout: 'card',
+//            items: [Ext.create('OpenNoms.widgets.SelectFlights'),{ 
+//                xtype: 'panel',
+//                title: 'Time...'
+//            }]
         }];
 
         this.callParent(arguments);
@@ -376,6 +398,7 @@
                 Ext.getCmp('flighttrackstartdatepicker').show();
                 Ext.getCmp('flighttrackstarttimepicker').show();
                 Ext.getCmp('staticlengthcombo').show();
+                Ext.getCmp('staticslider').show();
                 break;
             case 'realtime':
                 Ext.getCmp('flight-track-type-menu').setText('<span style="font-weight:bold;">Real Time Flight Track Replay</span>');
@@ -390,6 +413,7 @@
                 Ext.getCmp('flighttrackstartdatepicker').show();
                 Ext.getCmp('flighttrackstarttimepicker').show();
                 Ext.getCmp('animationspeedcombo').show();
+                Ext.getCmp('animationslider').show();
                 btn = Ext.getCmp('animationplaybutton');
                 btn.setText('Play');
                 btn.setIconCls('play');
@@ -402,8 +426,10 @@
         Ext.getCmp('flighttrackstartdatepicker').hide();
         Ext.getCmp('flighttrackstarttimepicker').hide();
         Ext.getCmp('staticlengthcombo').hide();
+        Ext.getCmp('staticslider').hide();
         Ext.getCmp('realtimemessage').hide();
         Ext.getCmp('animationplaybutton').hide();
         Ext.getCmp('animationspeedcombo').hide();
+        Ext.getCmp('animationslider').hide();
     }
 });

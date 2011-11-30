@@ -78,7 +78,9 @@
                 xtype: 'slider',
                 id: 'zoom-slider',
                 hideLabel: true,
-                useTips: false,
+                tipText: function(thumb){
+                    return Ext.String.format('<b>Zoom Level: {0}</b>', thumb.value);
+                },
                 vertical: true,
                 minValue: 0,
                 maxValue: 11,
