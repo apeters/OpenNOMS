@@ -481,9 +481,100 @@ CREATE TRIGGER update_noisematch_trigger BEFORE UPDATE ON noisematch FOR EACH RO
 CREATE TRIGGER update_operations_trigger BEFORE UPDATE ON operations FOR EACH ROW EXECUTE PROCEDURE update_operations_trigger();
 
 
--- Completed on 2011-11-29 11:40:17
+
+--
+-- TOC entry 182 (class 1259 OID 128764)
+-- Dependencies: 1576 8
+-- Name: rmts; Type: TABLE; Schema: opennoms; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE rmts (
+    gid integer NOT NULL,
+    inm double precision,
+    anoms_buf bigint,
+    longitude double precision,
+    latitude double precision,
+    city character varying,
+    address character varying,
+    rmt integer NOT NULL,
+    the_geom public.geometry,
+    radius integer,
+    ceiling integer,
+    secondsbefore integer,
+    secondsafter integer
+);
+
+
+ALTER TABLE opennoms.rmts OWNER TO postgres;
+
+--
+-- TOC entry 3307 (class 0 OID 0)
+-- Dependencies: 182
+-- Name: TABLE rmts; Type: COMMENT; Schema: opennoms; Owner: postgres
+--
+
+COMMENT ON TABLE rmts IS 'Remote Monitoring Tower locations and informations';
+
+
+--
+-- TOC entry 251 (class 1259 OID 129059)
+-- Dependencies: 8 182
+-- Name: rmts_gid_seq; Type: SEQUENCE; Schema: opennoms; Owner: postgres
+--
+
+CREATE SEQUENCE rmts_gid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE opennoms.rmts_gid_seq OWNER TO postgres;
+
+--
+-- TOC entry 3308 (class 0 OID 0)
+-- Dependencies: 251
+-- Name: rmts_gid_seq; Type: SEQUENCE OWNED BY; Schema: opennoms; Owner: postgres
+--
+
+ALTER SEQUENCE rmts_gid_seq OWNED BY rmts.gid;
+
+
+--
+-- TOC entry 3301 (class 2604 OID 129119)
+-- Dependencies: 251 182
+-- Name: gid; Type: DEFAULT; Schema: opennoms; Owner: postgres
+--
+
+ALTER TABLE rmts ALTER COLUMN gid SET DEFAULT nextval('rmts_gid_seq'::regclass);
+
+
+--
+-- TOC entry 3304 (class 2606 OID 129196)
+-- Dependencies: 182 182
+-- Name: rmts_pkey; Type: CONSTRAINT; Schema: opennoms; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY rmts
+    ADD CONSTRAINT rmts_pkey PRIMARY KEY (rmt);
+
+
+--
+-- TOC entry 3302 (class 1259 OID 129251)
+-- Dependencies: 182
+-- Name: rmts_idx; Type: INDEX; Schema: opennoms; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX rmts_idx ON rmts USING btree (rmt);
+
+ALTER TABLE rmts CLUSTER ON rmts_idx;
+
+
+-- Completed on 2011-11-29 13:56:35
 
 --
 -- PostgreSQL database dump complete
 --
+
 
