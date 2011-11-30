@@ -336,7 +336,7 @@ g := ' geometryn(st_multi(st_locatebetweenelevations(' || g || ', ' || minalt ||
 end if;
 g := g || ' as targets';
 statement := statement || '
-select opnum,stime,etime,runwaytime,actype,mactype,airport,adflag,macad,runway,airline,beacon,flight_id,night,inmnight,opertype,stage,image,manufactured,takeoffnoise,description,otherport,';
+select opnum,stime,etime,runwaytime,actype,mactype,airport,adflag,runway,airline,beacon,flight_id,night,inmnight,opertype,stage,image,manufactured,takeoffnoise,description,otherport,';
 statement := statement || g;
 statement := statement || '
 from operations_view where ';
@@ -468,3 +468,134 @@ return $return;$BODY$
   LANGUAGE plperl VOLATILE
   COST 100;
 ALTER FUNCTION macnoms.regex_replace(text, text, text) OWNER TO postgres;
+
+
+-- Function: opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text)
+
+-- DROP FUNCTION opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text);
+
+CREATE OR REPLACE FUNCTION opennoms.grabflights_opennoms2(isorange text, airport text DEFAULT ''::text, optypein text DEFAULT ''::text, adflagin text DEFAULT ''::text, runwayin text DEFAULT ''::text, nightmode text DEFAULT ''::text, timemode text DEFAULT ''::text, timesubset text DEFAULT ''::text, publicmode text DEFAULT ''::text, mactypein text DEFAULT ''::text, airlinein text DEFAULT ''::text, minalt text DEFAULT ''::text, maxalt text DEFAULT ''::text, extrasql text DEFAULT ''::text)
+  RETURNS SETOF opennoms.operations_view AS
+$BODY$declare
+iso_arr text[];
+iso text;
+--p period;
+sd timestamp; --1
+ed timestamp; --2
+date bool;
+statement text;
+retval opennoms.operations_view;
+sdlimit timestamp;
+edlimit timestamp;
+optype text := optypein;
+runway text :=runwayin;
+adflag text :=adflagin;
+mactype text :=mactypein;
+airline text :=airlinein;
+g text := 'targets';
+gw text := '';
+begin
+statement:='';
+set search_path to opennoms,alias,public;
+set enable_seqscan to off;
+for iso in select regexp_split_to_table(isorange,',') loop
+raise notice 'iso: %',iso;
+if (isorange is null) then 
+	raise warning 'bad iso date in input';
+        return;
+else 
+	--p:=iso_to_period(iso);
+	sd:= split_part(isorange,'/', 1);
+	ed:=split_part(isorange,'/', 2);
+	if sd=ed then
+		ed:=ed+'10 seconds';
+	end if;
+	raise notice 'timestamp';
+end if;  
+if (upper(publicmode)='TRUE' or upper(publicmode)='T') then
+	select into sdlimit,edlimit sdate,edate from publicdates limit 1;
+	sd:=greatest(least(sd,ed,edlimit),sdlimit);
+	ed:=least(greatest(sd,ed,sdlimit),edlimit);
+end if;
+if (upper(timesubset)='TRUE' or upper(timesubset)='T') then
+g := 'track_by_time_period(' || g || ',stime,etime,''' || sd || '''::timestamptz,''' || ed || '''::timestamptz) ';
+gw := ' geometrytype( ' || g || ')=''LINESTRING'' and ';
+end if;
+if (minalt~E'^[0-9]+$' and maxalt~E'^[0-9]+$') then
+gw := gw || '(st_zmin(' || g || ')<=' || maxalt || ' and st_zmax(' || g || ')>=' || minalt || ') and ';
+g := ' geometryn(st_multi(st_locatebetweenelevations(' || g || ', ' || minalt || ', ' || maxalt || ')),1)';
+end if;
+g := g || ' as targets';
+statement := statement || '
+select opnum,stime,etime,runwaytime,actype,mactype,airport,adflag,runway,airline,beacon,flight_id,night,inmnight,opertype,stage,image,manufactured,takeoffnoise,description,otherport,';
+statement := statement || g;
+statement := statement || '
+from operations_view where ';
+
+--statement := statement || ' period_cc(stime, etime) && ''[' || sd || ',' || ed || ']'' and ';
+
+statement := statement || '''' || sd || ''' < stime AND ''' || ed || ''' > etime AND ';
+
+if (timemode = 'runwaytime') then
+	statement := statement || ' runwaytime between ''' || sd || ''' and ''' || ed || ''' and ';
+elsif (timemode = 'stime' or timemode = 'starttime') then
+	statement := statement || ' stime between ''' || sd || ''' and ''' || ed || ''' and ';
+elsif (timemode = 'etime' or timemode = 'endtime') then
+	statement := statement || ' etime between ''' || sd || ''' and ''' || ed || ''' and ';
+end if;	
+
+statement := statement || parselist(airport,'airport','^[a-z]{3}(,[a-z]{3})*$') || ' and ';
+
+if (airport='MSP') then
+	statement := statement || ' runway in (''12L'',''12R'',''30L'',''30R'',''17'',''35'',''04'',''22'') and ';
+end if;
+
+statement := statement || parselist(optype,'opertype','^[a-z](,[a-z])*$') || ' and ';
+
+statement := statement || parselist(adflag,'adflag','^[ado](,[ado])*$') || ' and ';
+
+statement := statement || parselist(runway,'runway','^([0-9][0-9]?[A-Z]?)(,[0-9][0-9]?[A-Z]?)*$') || ' and ';
+
+
+if (upper(nightmode)='TRUE' or upper(nightmode)='T') or upper(nightmode)='NIGHT' then
+	raise notice 'filtered by night flights';
+	statement := statement || ' 
+	night=true and ';
+elsif (upper(nightmode)='FALSE' or upper(nightmode)='F') then
+	raise notice 'filtered by night flights (day only)';
+	statement := statement || ' 
+	(night=false or night is null) and ';
+elsif (upper(nightmode)='INMNIGHT' or upper(nightmode)='INM') then
+	raise notice 'filtered by inm night flights';
+	statement := statement || ' 
+	(inmnight=true) and '; 
+elsif (upper(nightmode)='INMDAY') then
+	raise notice 'filtered by inm night flights';
+	statement := statement || ' 
+	(inmnight=false or inmnight is null) and '; 
+end if;
+
+statement := statement || parselist(mactype,'mactype','^[a-z0-9]+(,[a-z0-9])*$') || ' and ';
+statement := statement || parselist(airline,'airline','^[a-z]{3}(,[a-z]{3})*$') || ' and ';
+
+
+statement := statement || gw;
+statement := statement || extrasql;
+statement := trim(trailing 'and ' from statement);
+statement := statement || ' union all ';
+raise notice '2statement: %',statement;
+end loop;
+statement := trim(trailing 'union all ' from statement);
+statement := regexp_replace(statement,E'(and[ ]+)+',' and ','gi');
+raise notice '3statement: %',statement;
+--for retval in execute statement loop
+--	return query select (retval).* ;
+--end loop; 
+return query execute statement;
+--return;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text) OWNER TO postgres;
