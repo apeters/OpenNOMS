@@ -67,3 +67,7 @@
     margin: auto; 
     cursor: pointer;
 }
+
+.x-grid-row-partialchecked .x-grid-row-checker {
+    background-image: url('../images/partialchecked.gif');
+}

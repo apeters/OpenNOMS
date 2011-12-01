@@ -1,20 +1,10 @@
-﻿var data = [{
-  name: 'item 1',
-  id: 0
-}, {
-    name: 'item 2',
-    id: 1
-}, {
-    name: 'item 3',
-    id: 2
-}];
-
-Ext.define('OpenNoms.widgets.SelectFlights', {
+﻿Ext.define('OpenNoms.widgets.SelectFlights', {
     extend: 'Ext.grid.Panel',
     alias: 'widgets.opennoms-widgets-selectflights',
 
     id: 'select-flights',
-    title: 'Select Flights',
+    title: 'Select Flights for Display',
+    hideHeaders: true,
 
     initComponent: function () {
         var url = 'http://localhost:8080/geoserver/opennoms/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opennoms:advanced_query_choices&maxFeatures=50&outputFormat=json';
@@ -24,7 +14,50 @@ Ext.define('OpenNoms.widgets.SelectFlights', {
             proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
                 url: url
             }),
-            autoLoad: true
+            autoLoad: true,
+            listeners: {
+                'update': function (store, record, operation, opts) {
+                    var group = record.get('group');
+                    var groupNodeEl = Ext.get('groupcheck' + group).up('dl');
+                    var classes = groupNodeEl.dom.classList;
+                    var records = store.queryBy(function (rec, id) {
+                        return (rec.data[store.groupField] == group);
+                    }, this);
+                    var allOn = true;
+                    var allOff = true;
+                    records.each(function (item, index, allItems) {
+                        if (item.get('ischecked')) {
+                            allOff = false;
+                        } else {
+                            allOn = false
+                        }
+                    }, this);
+                    if (!allOff && !allOn) {
+                        //third state
+                        if (classes.contains('x-grid-row-checked')) {
+                            groupNodeEl.removeCls('x-grid-row-checked');
+                        }
+                        if (!classes.contains('x-grid-row-partialchecked')) {
+                            groupNodeEl.addCls('x-grid-row-partialchecked');
+                        }
+                    } else {
+                        if (classes.contains('x-grid-row-partialchecked')) {
+                            groupNodeEl.removeCls('x-grid-row-partialchecked');
+                        }
+                        if (allOn) {
+                            if (!classes.contains('x-grid-row-checked')) {
+                                groupNodeEl.addCls('x-grid-row-checked');
+                            }
+                        } else {
+                            if (classes.contains('x-grid-row-checked')) {
+                                groupNodeEl.removeCls('x-grid-row-checked');
+                            }
+                        }
+                    }
+                    //groupNodeEl.removeCls('x-grid-row-checked');
+                },
+                scope: this
+            }
         });
 
         this.columns = [
@@ -32,8 +65,6 @@ Ext.define('OpenNoms.widgets.SelectFlights', {
                 'checkchange': function (column, recIndex, checked) {
                     var record = this.store.getAt(recIndex);
                     record.commit();
-                    //                    delete record.modified['ischecked'];
-                    //                    this.getView().refresh();
                 },
                 scope: this
             }
@@ -41,9 +72,11 @@ Ext.define('OpenNoms.widgets.SelectFlights', {
             { header: 'Name', dataIndex: 'name', flex: 1 }
         ];
 
-        this.features = [Ext.create('Ext.grid.feature.CheckGrouping', {
+        this.features = [{
+            ftype: 'checkgrouping',
+            checkField: 'ischecked',
             groupHeaderTpl: '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
-        })];
+        }];
 
         this.callParent(arguments);
     }
@@ -54,14 +87,15 @@ Ext.define('OpenNoms.widgets.SelectFlights', {
 Ext.define('Ext.grid.feature.CheckGrouping', {
     extend: 'Ext.grid.feature.Grouping',
     requires: 'Ext',
-    alias: 'feature.brigrouping',
+    alias: 'feature.checkgrouping',
+    checkField: '',
 
     constructor: function () {
         this.callParent(arguments);
 
         this.groupHeaderTpl = ['<dl style="height:18px; border:0px !important" class="x-grid-row-checked">',
              '<dd id="groupcheck{name}" class="x-grid-row-checker x-column-header-text" style="width:18px; float:left;" x-grid-group-hd-text="{text}">&nbsp;</dd>',
-             '<dd style="float:left; padding:3px 0px 0px 3px;">',
+             '<dd style="float:left; padding:0px 0px 0px 3px;">',
              this.groupHeaderTpl,
              '</dd>',
              '</dl>'
@@ -97,11 +131,19 @@ Ext.define('Ext.grid.feature.CheckGrouping', {
     toggleCheckbox: function (group, node, view) {
         var nodeEl = Ext.get(node).down('dl');
         var classes = nodeEl.dom.classList;
-        if (!classes.contains('x-grid-row-checked')) {
-            nodeEl.addCls('x-grid-row-checked');
-        }
-        else {
-            nodeEl.removeCls('x-grid-row-checked');
-        }
+        var checked = !classes.contains('x-grid-row-checked');
+        var records = view.store.queryBy(
+            function (record, id) {
+                if (record.data[view.store.groupField] == group) {
+                    if (checked) {
+                        record.set(this.checkField, true);
+                    }
+                    else {
+                        record.set(this.checkField, false);
+                    }
+                    record.commit();
+                }
+            }, this
+        );
     }
 });
