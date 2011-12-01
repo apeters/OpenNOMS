@@ -87,11 +87,39 @@
             }]
         });
 
+        this.selectFlightsButton = Ext.create('Ext.panel.Panel', {
+            frame: true,
+            floating: true,
+            width: 40,
+            height: 40,
+            layout: 'fit',
+            items: [{
+                xtype: 'button',
+                iconCls: 'icon-center plane',
+                tooltip: 'Select Flights',
+                iconAlign: 'top',
+                text: '',
+                scale: 'medium',
+                enableToggle: true,
+                toggleGroup: 'info-panel-controls',
+                toggleHandler: function (btn, state) {
+                    if (state) {
+                        this.infoPanel.show();
+                        this.infoPanel.alignTo(this.mapPanel, 'tr-tr', [-60, 10]);
+                        this.infoPanel.layout.setActiveItem(2);
+                    } else {
+                        this.infoPanel.hide();
+                    }
+                },
+                scope: this
+            }]
+        });
+
         this.infoPanel = Ext.create('Ext.panel.Panel', {
             frame: true,
             floating: true,
             width: 375,
-            height: 220,
+            height: 320,
             layout: 'card',
             items: [{
                 xtype: 'panel',
@@ -115,7 +143,15 @@
                     },
                     scope: this
                 }]
-            }],
+            }, Ext.create('OpenNoms.widgets.SelectFlights', {
+                tools: [{
+                    type: 'close',
+                    handler: function (event, toolEl, panel) {
+                        this.selectFlightsButton.query('button')[0].toggle();
+                    },
+                    scope: this
+                }]
+            })],
             listeners: {
                 'show': function () {
                     this.on({
@@ -171,18 +207,22 @@
             'activate': function () {
                 this.noiseButton.show();
                 this.legendButton.show();
+                this.selectFlightsButton.show();
                 this.on({
                     'afterlayout': function () {
                         this.noiseButton.alignTo(this.mapPanel, 'tr-tr', [-10, 60]);
                         this.legendButton.alignTo(this.mapPanel, 'tr-tr', [-10, 10]);
+                        this.selectFlightsButton.alignTo(this.mapPanel, 'tr-tr', [-10, 110]);
                     },
                     'activate': function () {
                         this.noiseButton.show();
                         this.legendButton.show();
+                        this.selectFlightsButton.show();
                     },
                     'deactivate': function () {
                         this.noiseButton.hide();
                         this.legendButton.hide();
+                        this.selectFlightsButton.hide();
                     },
                     scope: this
                 });

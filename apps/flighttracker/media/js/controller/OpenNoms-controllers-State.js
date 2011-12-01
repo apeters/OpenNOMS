@@ -20,7 +20,8 @@
             Ext.getCmp('staticlengthcombo').hide();
             Ext.getCmp('realtimemessage').hide();
             Ext.getCmp('animationplaybutton').hide();
-            Ext.getCmp('animationspeedcombo').hide(); 
+            Ext.getCmp('animationspeedcombo').hide();
+            Ext.getCmp('animationslider').hide();
             Ext.getCmp('gobutton').hide();
             
             switch (state) {
@@ -44,6 +45,7 @@
                     Ext.getCmp('flighttrackstartdatepicker').show();
                     Ext.getCmp('flighttrackstarttimepicker').show();
                     Ext.getCmp('animationspeedcombo').show();
+                    Ext.getCmp('animationslider').show();
                     Ext.getCmp('gobutton').show();
                     btn = Ext.getCmp('animationplaybutton');
                     btn.setText('Play');
