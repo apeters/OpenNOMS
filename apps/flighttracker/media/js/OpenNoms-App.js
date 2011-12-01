@@ -25,6 +25,10 @@ OpenNoms.app = {
                 this.appPanel
             ]
         });
+
+        this.stateController = Ext.create('OpenNoms.controller.State', {});
+
+        this.queryController = Ext.create('OpenNoms.controller.Query', {});
     },
 
     /*
@@ -51,6 +55,23 @@ OpenNoms.app = {
             scope: this
         });
 
+        this.appPanel.appHeader.on({
+            'changestate': this.stateController.changeState,
+            scope: this.stateController
+        });
+
+        this.appPanel.appHeader.on({
+            'setdatetimerange': function () {
+                this.queryController.updateQuery(this.appPanel.mapPanel);
+            },
+            scope: this
+        });
+
+        this.queryController.on({
+            'queryupdated': this.appPanel.mapPanel,
+            scope: this.queryController
+        });
+
         this.appPanel.mapPanel.on({
             'distancemeasurecomplete': function (feature) {
                 var measure = feature.geometry.getLength().toFixed(3) + ' ' + this.appPanel.mapPanel.map.getUnits();
@@ -68,6 +89,7 @@ OpenNoms.app = {
                 Ext.get('measure-read-out').dom.innerHTML = measure;
                 Ext.getCmp('measure-button').toggle(false);
             },
+            'mapready': this.queryController.updateQuery,
             scope: this
         });
 

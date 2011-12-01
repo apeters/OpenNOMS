@@ -16,7 +16,9 @@
     initComponent: function () {
         this.addEvents({
             'measureclicked': true,
-            'headerresized': true
+            'headerresized': true,
+            'changestate': true,
+            'setdatetimerange': true
         });
 
         this.height = this.smallHeight;
@@ -211,19 +213,19 @@
                     items: [{
                         text: 'Static Flight Tracks',
                         handler: function () {
-                            this.setFlightTrackToolbarState('static');
+                            this.fireEvent('changestate', 'static');
                         },
                         scope: this
                     }, {
                         text: 'Real Time Flight Track Replay',
                         handler: function () {
-                            this.setFlightTrackToolbarState('realtime');
+                            this.fireEvent('changestate', 'realtime');
                         },
                         scope: this
                     }, {
                         text: 'Animated Flight Track Replay',
                         handler: function () {
-                            this.setFlightTrackToolbarState('animated');
+                            this.fireEvent('changestate', 'animated');
                         },
                         scope: this
                     }]
@@ -304,6 +306,15 @@
                 displayField: 'text',
                 valueField: 'length'
             },{
+                xtype: 'button',
+                id: 'gobutton',
+                iconCls: 'icon-center refresh',
+                scope: this,
+                handler: function () {
+                    this.fireEvent('setdatetimerange');
+                },
+                scale: 'small'
+            },{
                 xtype: 'combo',
                 id: 'animationspeedcombo',
                 name: 'animationspeed',
@@ -366,44 +377,5 @@
             single: true,
             scope: this
         });
-    },
-
-    setFlightTrackToolbarState: function (state) {
-        this.hideFlightTrackControls();
-        switch (state) {
-            case 'static':
-                Ext.getCmp('flight-track-type-menu').setText('<span style="font-weight:bold;">Static Flight Tracks</span>');
-                Ext.getCmp('flighttrackstartdatepicker').show();
-                Ext.getCmp('flighttrackstarttimepicker').show();
-                Ext.getCmp('staticlengthcombo').show();
-                break;
-            case 'realtime':
-                Ext.getCmp('flight-track-type-menu').setText('<span style="font-weight:bold;">Real Time Flight Track Replay</span>');
-                Ext.getCmp('realtimemessage').show();
-                btn = Ext.getCmp('animationplaybutton');
-                btn.setText('Pause');
-                btn.setIconCls('pause');
-                btn.show();
-                break;
-            case 'animated':
-                Ext.getCmp('flight-track-type-menu').setText('<span style="font-weight:bold;">Animated Flight Track Replay</span>');
-                Ext.getCmp('flighttrackstartdatepicker').show();
-                Ext.getCmp('flighttrackstarttimepicker').show();
-                Ext.getCmp('animationspeedcombo').show();
-                btn = Ext.getCmp('animationplaybutton');
-                btn.setText('Play');
-                btn.setIconCls('play');
-                btn.show();
-                break;
-        }
-    },
-
-    hideFlightTrackControls: function () {
-        Ext.getCmp('flighttrackstartdatepicker').hide();
-        Ext.getCmp('flighttrackstarttimepicker').hide();
-        Ext.getCmp('staticlengthcombo').hide();
-        Ext.getCmp('realtimemessage').hide();
-        Ext.getCmp('animationplaybutton').hide();
-        Ext.getCmp('animationspeedcombo').hide();
     }
 });
