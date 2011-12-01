@@ -9,18 +9,40 @@
     initComponent: function () {
         this.addEvents({
             'distancemeasurecomplete': true,
-            'areameasurecomplete': true
+            'areameasurecomplete': true,
+            'mapready': true
         });
 
+//        this.map = new OpenLayers.Map('map', {
+//            restrictedExtent: new OpenLayers.Bounds(-10470724.958188, 5549098.4316464, -10285900.22382, 5685003.4679186),
+//            numZoomLevels: 10,
+//            fallThrough: false,
+//            controls: [new OpenLayers.Control.Navigation()],
+//            projection: new OpenLayers.Projection("EPSG:900913"),
+//            displayProjection: new OpenLayers.Projection("EPSG:4326"),
+//            maxExtent: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508.34)
+//        });
         this.map = new OpenLayers.Map('map', {
-            restrictedExtent: new OpenLayers.Bounds(-10470724.958188, 5549098.4316464, -10285900.22382, 5685003.4679186),
-            numZoomLevels: 10,
-            fallThrough: false,
-            controls: [new OpenLayers.Control.Navigation()],
-            projection: new OpenLayers.Projection("EPSG:900913"),
+            //layers: [
+	        //    ortho, tmsbase, tmscontours, tmsrmts, tabtracks, realtime, flightlayer, querylayer, eventlayer
+            //],
+            controls: [
+	            new OpenLayers.Control.Navigation({ zoomWheelEnabled: false })
+	        ],
+            center: new OpenLayers.LonLat(482188, 4969538),
+            maxExtent: new OpenLayers.Bounds(411482, 4900449, 552143, 5041149),
+            projection: new OpenLayers.Projection("EPSG:26915"),
             displayProjection: new OpenLayers.Projection("EPSG:4326"),
-            maxExtent: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508.34)
+            resolutions: [256, 128, 64, 32, 16, 8, 4, 2, 1],
+            tileSize: new OpenLayers.Size(512, 512),
+            allOverlays: true
         });
+
+        this.supportedProjections = {
+            geographic: new OpenLayers.Projection("EPSG:4326"),
+            mercator: new OpenLayers.Projection("EPSG:900913"),
+            utm: new OpenLayers.Projection("EPSG:26915"),
+        };
 
         this.bbar = Ext.create('Ext.toolbar.Toolbar', {
             items: [
@@ -36,6 +58,38 @@
         });
 
         this.callParent(arguments);
+
+        //tiled version of MAC base layers from MapProxy
+        this.tmsbase = new OpenLayers.Layer.TMS(
+	        'Base Map',
+	        'http://app.macnoise.com/mapproxy/tms/',
+	        { 
+                layername: 'base_EPSG26915', 
+                type: 'png', 
+                tileSize: new OpenLayers.Size(512, 512), 
+                opacity: 0.7, 
+                buffer: 0 
+            }
+         );
+         //http://localhost:8080/geoserver/opennoms/wms?service=WMS&version=1.1.0&request=GetMap&layers=opennoms:macnoise&styles=&bbox=409881.0,4895839.0,556218.0,5043912.01&width=505&height=512&srs=EPSG:26915&format=image/png&viewparams=airport:MSP;isorange:2011-08-05 16\:00\:00/2011-08-06 16\:10\:00;optype:;runway:30R;airline:UAL
+
+        //static flight track layer
+        this.staticflightlayer = new OpenLayers.Layer.WMS(
+	        "Static Flight Tracks",
+	        "http://localhost:8080/geoserver/opennoms/wms",
+	        { 
+                layers: 'opennoms:macnoise', 
+                transparent: "true", 
+                isodate: '2000-1-1' 
+            },{ 
+                singleTile: true, 
+                projection: this.supportedProjections.utm, 
+                maxExtent: new OpenLayers.Bounds(411482, 4900449, 552143, 5041149), 
+                maxResolution: 274.8046875, 
+                opacity: 0.6, 
+                displayInLayerSwitcher: false
+            }
+          );
 
         this.gmapsStreets = new OpenLayers.Layer.Google(
             "Streets", // the default
@@ -109,7 +163,7 @@
     mapReady: function () {
         this.map.updateSize();
 
-        this.map.addLayers([this.gmapsStreets, this.gmapsHybrid, this.gmapsAerial]);
+        this.map.addLayers([this.tmsbase]);
 
         var measureStyle = OpenLayers.Util.applyDefaults({
             strokeColor: "#808080",
@@ -128,7 +182,7 @@
             }
         );
 
-        this.map.addLayers([this.measureLayer]);
+        this.map.addLayers([this.measureLayer, this.staticflightlayer]);
 
         this.drawDistanceMeasureControl = new OpenLayers.Control.DrawFeature(this.measureLayer,
             OpenLayers.Handler.Path, {
@@ -160,8 +214,6 @@
 
         this.map.addControls([this.drawAreaMeasureControl, this.drawDistanceMeasureControl]);
 
-        this.map.zoomToMaxExtent();
-
         this.mousePosition = new OpenLayers.Control.MousePosition({
             element: Ext.get('cursor-position').dom
         });
@@ -182,6 +234,10 @@
             this.doLayout();
         });
 
+        this.map.zoomTo(4);
+
         this.doLayout();
+
+        this.fireEvent('mapready', this);
     }
 });

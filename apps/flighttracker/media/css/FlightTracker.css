@@ -37,6 +37,9 @@
 .sound {
 	background-image:url(../images/silk/icons/sound.png) !important;
 }
+.refresh {
+	background-image:url(../images/silk/icons/arrow_refresh.png) !important;
+}
 .ruler {
 	background-image:url(../images/geosilk/ruler.png) !important;
 }
