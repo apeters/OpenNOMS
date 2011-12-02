@@ -132,22 +132,59 @@
             }
         );
 
-        var noiseEventStyle = OpenLayers.Util.applyDefaults({
-            strokeColor: "#FFFF00",
-            strokeOpacity: 1,
-            strokeWidth: 4,
-            pointRadius: 10,
-            graphicName: 'circle',
-            fillOpacity: 0,
-        }, OpenLayers.Feature.Vector.style["default"]);
+//        var noiseEventStyle = OpenLayers.Util.applyDefaults({
+//            strokeColor: "#FFFF00",
+//            strokeOpacity: 1,
+//            strokeWidth: 4,
+//            pointRadius: 10,
+//            graphicName: 'circle',
+//            fillOpacity: 0
+//        }, OpenLayers.Feature.Vector.style["default"]);
+
+        var noiseEventStyle = new OpenLayers.StyleMap({
+            "default": new OpenLayers.Style({
+                strokeColor: "#FFFF00",
+                strokeOpacity: 1,
+                strokeWidth: 4,
+                pointRadius: 10,
+                graphicName: 'circle',
+                fillOpacity: 0,
+                labelAlign: 'cb',
+                labelYOffset: 15,
+                label: "${lmax}",
+                fontWeight: 'normal'
+            }),
+            "select": new OpenLayers.Style({
+                fillColor: "#66ccff",
+                strokeColor: "#3399ff",
+                strokeOpacity: 1,
+                strokeWidth: 4,
+                pointRadius: 10,
+                graphicName: 'circle',
+                fillOpacity: 0.2,
+                labelAlign: 'cb',
+                labelYOffset: 15,
+                label: "${lmax}",
+                fontWeight: 'bold'
+            })
+        });
 
         this.noiseEventLayer = new OpenLayers.Layer.Vector(
             "NoiseEventLayer", {
-                style: noiseEventStyle
+                styleMap: noiseEventStyle
             }
         );
 
         this.map.addLayers([this.tmsbase, this.staticflightlayer, this.noiseEventLayer, this.measureLayer]);
+
+        this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
+            multiple: false, 
+            hover: true
+        });
+
+        this.map.addControls([this.noiseEventHoverControl]);
+
+        this.noiseEventHoverControl.activate();
 
         this.drawDistanceMeasureControl = new OpenLayers.Control.DrawFeature(this.measureLayer,
             OpenLayers.Handler.Path, {

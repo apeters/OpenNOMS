@@ -109,6 +109,16 @@ OpenNoms.app = {
                         });
                     }
                 }, this);
+                this.appPanel.mapPanel.noiseEventHoverControl.events.on({
+                    'featurehighlighted': function (e) {
+                        var view = Ext.getCmp('noise-event-viewer').view;
+                        view.highlightItem(view.getNode(e.feature.record));
+                    },
+                    'featureunhighlighted': function (e) {
+                        Ext.getCmp('noise-event-viewer').view.clearHighlight();
+                    },
+                    scope: this
+                });
                 //this.queryController.updateQuery();
             },
             scope: this
@@ -136,24 +146,27 @@ OpenNoms.app = {
 
         Ext.getCmp('noise-event-viewer').store.on({
             'load': function (store, records, success, operation, opts) {
+                this.appPanel.noiseButton.query('button')[0].toggle(true);
                 var features = []
                 this.appPanel.mapPanel.noiseEventLayer.removeAllFeatures();
                 Ext.each(records, function (record, index, allRecords) {
                     var feature = this.appPanel.mapPanel.wktFormat.read(record.get('wkt'));
-                    feature.style = {
-                        strokeColor: "#FFFF00",
-                        strokeOpacity: 1,
-                        strokeWidth: 4,
-                        pointRadius: 10,
-                        graphicName: 'circle',
-                        fillOpacity: 0,
-                        labelAlign: 'cb',
-                        labelYOffset: 15,
-                        label: Ext.String.format('{0}', record.get('lmax'))
-                    };
+                    feature.attributes = record.data;
                     features.push(feature);
+                    feature.record = record;
+                    record.feature = feature;
                 }, this);
                 this.appPanel.mapPanel.noiseEventLayer.addFeatures(features);
+            },
+            scope: this
+        });
+
+        Ext.getCmp('noise-event-viewer').on({
+            'itemmouseenter': function (view, record, item) {
+                this.appPanel.mapPanel.noiseEventHoverControl.select(record.feature);
+            },
+            'itemmouseleave': function (view, record, item) {
+                this.appPanel.mapPanel.noiseEventHoverControl.unselect(record.feature);
             },
             scope: this
         });
