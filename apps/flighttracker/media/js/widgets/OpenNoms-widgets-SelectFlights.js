@@ -7,7 +7,7 @@
     hideHeaders: true,
 
     initComponent: function () {
-        var url = 'http://localhost:8080/geoserver/opennoms/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opennoms:advanced_query_choices&maxFeatures=50&outputFormat=json';
+        var url = OpenNoms.config.URLs.selectFlightsDomainData;
         this.store = Ext.create('Ext.data.Store', {
             fields: ['group', 'name', 'value', 'ischecked'],
             groupField: 'group',
@@ -32,7 +32,6 @@
                         }
                     }, this);
                     if (!allOff && !allOn) {
-                        //third state
                         if (groupNodeEl.hasCls('x-grid-row-checked')) {
                             groupNodeEl.removeCls('x-grid-row-checked');
                         }
@@ -53,28 +52,45 @@
                             }
                         }
                     }
-                    //groupNodeEl.removeCls('x-grid-row-checked');
                 },
                 scope: this
             }
         });
 
-        this.columns = [
-            { xtype: 'checkcolumn', header: '', dataIndex: 'ischecked', width: 56, listeners: {
+        this.columns = [{
+            header: '',
+            dataIndex: 'name',
+            renderer: function () {
+                return '';
+            },
+            width: 25
+        }, {
+            xtype: 'checkcolumn',
+            header: '',
+            dataIndex: 'ischecked',
+            width: 22,
+            listeners: {
                 'checkchange': function (column, recIndex, checked) {
                     var record = this.store.getAt(recIndex);
                     record.commit();
                 },
                 scope: this
             }
-            },
-            { header: 'Name', dataIndex: 'name', flex: 1 }
-        ];
+        }, {
+            header: 'Name',
+            dataIndex: 'name',
+            flex: 1
+        }];
 
         this.features = [{
             ftype: 'checkgrouping',
             checkField: 'ischecked',
-            groupHeaderTpl: '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
+            //groupHeaderTpl: '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
+            groupHeaderTpl: '{[values.name == "Airline" ? "Airlines" : ""]}' +
+                '{[values.name == "Airport:FCM" ? "FCM Aiport Runways" : ""]}' +
+                '{[values.name == "Airport:MSP" ? "MSP Airport Runways" : ""]}' +
+                '{[values.name == "Airport:STP" ? "STP Airport Runways" : ""]}' +
+                '{[values.name == "Flight Type" ? "Flight Types" : ""]}'
         }];
 
         this.callParent(arguments);
