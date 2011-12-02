@@ -104,13 +104,37 @@ OpenNoms.app = {
             },
             scope: this
         });
+
+        Ext.getCmp('noise-event-viewer').store.on({
+            'load': function (store, records, success, operation, opts) {
+                var features = []
+                this.appPanel.mapPanel.noiseEventLayer.removeAllFeatures();
+                Ext.each(records, function (record, index, allRecords) {
+                    var feature = this.appPanel.mapPanel.wktFormat.read(record.get('wkt'));
+                    feature.style = {
+                        strokeColor: "#FFFF00",
+                        strokeOpacity: 1,
+                        strokeWidth: 4,
+                        pointRadius: 10,
+                        graphicName: 'circle',
+                        fillOpacity: 0,
+                        labelAlign: 'cb',
+                        labelYOffset: 15,
+                        label: Ext.String.format('{0}', record.get('lmax'))
+                    };
+                    features.push(feature);
+                }, this);
+                this.appPanel.mapPanel.noiseEventLayer.addFeatures(features);
+            },
+            scope: this
+        });
     },
 
     /*
     * load the data into the app
     */
     loadData: function () {
-
+        Ext.getCmp('noise-event-viewer').store.load();
     },
 
     initControllers: function () {

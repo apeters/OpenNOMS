@@ -325,7 +325,8 @@
                 maxValue: 1440,
                 values: [0,10],
                 increment: 5,
-                style: 'margin-left: 15px;margin-right: 15px;'
+                style: 'margin-left: 15px;margin-right: 15px;',
+                hidden: true
             },{
                 xtype: 'combo',
                 id: 'animationspeedcombo',
@@ -339,6 +340,7 @@
                 store: Ext.create('Ext.data.Store', {
                     fields: ['multiplier', 'text'],
                     data: [
+                        { "multiplier": 1, "text": "1 x" },
                         { "multiplier": 2, "text": "2 x" },
                         { "multiplier": 4, "text": "4 x" },
                         { "multiplier": 10, "text": "10 x" },

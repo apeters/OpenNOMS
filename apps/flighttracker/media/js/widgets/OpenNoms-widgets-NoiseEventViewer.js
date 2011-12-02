@@ -23,8 +23,7 @@
             ],
             proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
                 url: url
-            }),
-            autoLoad: true
+            })
         });
 
         this.columns = [
