@@ -89,8 +89,37 @@ OpenNoms.app = {
                 Ext.get('measure-read-out').dom.innerHTML = measure;
                 Ext.getCmp('measure-button').toggle(false);
             },
-            'mapready': this.queryController.updateQuery,
+            'mapready': function () {
+                Ext.each(this.appPanel.mapPanel.map.layers, function (layer, index, allLayers) {
+                    if (layer.showInLegend) {
+                        var store = Ext.getCmp('legend-grid').store;
+                        store.add({ 'name': layer.name, 'layer': layer, 'isOn': layer.getVisibility() });
+                        layer.events.on({
+                            'visibilitychanged': function (e) {
+                                var index = store.find('layer', layer);
+                                if (index > -1) {
+                                    var rec = store.getAt(index);
+                                    if (rec.get('isOn') != layer.getVisibility()) {
+                                        rec.set('isOn', layer.getVisibility());
+                                        rec.commit();
+                                    }
+                                }
+                            },
+                            scope: this
+                        });
+                    }
+                }, this);
+                //this.queryController.updateQuery();
+            },
             scope: this
+        });
+
+        this.appPanel.on({
+            'afterlayout': function () {
+                this.appPanel.mapPanel.mapReady();
+            },
+            scope: this,
+            single: true
         });
 
         this.appPanel.on({
@@ -128,6 +157,18 @@ OpenNoms.app = {
             },
             scope: this
         });
+
+        Ext.getCmp('legend-grid').store.on({
+            'update': function (store, record, operation, opts) {
+                var layer = record.get('layer');
+                if (record.get('isOn') != layer.getVisibility()) {
+                    layer.setVisibility(record.get('isOn'));
+                }
+            },
+            scope: this
+        });
+
+        this.viewport.doLayout();
     },
 
     /*

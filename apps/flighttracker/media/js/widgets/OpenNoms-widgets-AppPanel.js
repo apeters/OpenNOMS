@@ -18,17 +18,7 @@
                 this.appHeader,
                 this.mapPanel
             ],
-            layout: 'border',
-            listeners: {
-                'afterlayout': {
-                    fn: function () {
-                        this.mapPanel.mapReady();
-                    },
-                    scope: this,
-                    single: true
-                },
-                scope: this
-            }
+            layout: 'border'
         });
 
         this.noiseButton = Ext.create('Ext.panel.Panel', {
@@ -129,10 +119,7 @@
                     },
                     scope: this
                 }]
-            }), {
-                xtype: 'panel',
-                title: 'Legend',
-                html: '',
+            }), Ext.create('OpenNoms.widgets.Legend', {
                 tools: [{
                     type: 'close',
                     handler: function (event, toolEl, panel) {
@@ -140,7 +127,7 @@
                     },
                     scope: this
                 }]
-            }, Ext.create('OpenNoms.widgets.SelectFlights', {
+            }), Ext.create('OpenNoms.widgets.SelectFlights', {
                 tools: [{
                     type: 'close',
                     handler: function (event, toolEl, panel) {

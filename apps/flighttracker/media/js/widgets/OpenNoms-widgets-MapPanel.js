@@ -55,7 +55,8 @@
             type: 'png', 
             tileSize: new OpenLayers.Size(512, 512), 
             opacity: 0.7, 
-            buffer: 0 
+            buffer: 0,
+            showInLegend: true
         });
  
         //static flight track layer
