@@ -19,7 +19,6 @@
                 'update': function (store, record, operation, opts) {
                     var group = record.get('group');
                     var groupNodeEl = Ext.get('groupcheck' + group).up('dl');
-                    var classes = groupNodeEl.dom.classList;
                     var records = store.queryBy(function (rec, id) {
                         return (rec.data[store.groupField] == group);
                     }, this);
@@ -34,22 +33,22 @@
                     }, this);
                     if (!allOff && !allOn) {
                         //third state
-                        if (classes.contains('x-grid-row-checked')) {
+                        if (groupNodeEl.hasCls('x-grid-row-checked')) {
                             groupNodeEl.removeCls('x-grid-row-checked');
                         }
-                        if (!classes.contains('x-grid-row-partialchecked')) {
+                        if (!groupNodeEl.hasCls('x-grid-row-partialchecked')) {
                             groupNodeEl.addCls('x-grid-row-partialchecked');
                         }
                     } else {
-                        if (classes.contains('x-grid-row-partialchecked')) {
+                        if (groupNodeEl.hasCls('x-grid-row-partialchecked')) {
                             groupNodeEl.removeCls('x-grid-row-partialchecked');
                         }
                         if (allOn) {
-                            if (!classes.contains('x-grid-row-checked')) {
+                            if (!groupNodeEl.hasCls('x-grid-row-checked')) {
                                 groupNodeEl.addCls('x-grid-row-checked');
                             }
                         } else {
-                            if (classes.contains('x-grid-row-checked')) {
+                            if (groupNodeEl.hasCls('x-grid-row-checked')) {
                                 groupNodeEl.removeCls('x-grid-row-checked');
                             }
                         }
@@ -130,8 +129,7 @@ Ext.define('Ext.grid.feature.CheckGrouping', {
     },
     toggleCheckbox: function (group, node, view) {
         var nodeEl = Ext.get(node).down('dl');
-        var classes = nodeEl.dom.classList;
-        var checked = !classes.contains('x-grid-row-checked');
+        var checked = !nodeEl.hasCls('x-grid-row-checked');
         var records = view.store.queryBy(
             function (record, id) {
                 if (record.data[view.store.groupField] == group) {
