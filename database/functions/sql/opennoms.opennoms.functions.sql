@@ -454,11 +454,11 @@ ALTER FUNCTION opennoms.parselist(text, text, text) OWNER TO postgres;
 
 
 
--- Function: macnoms.regex_replace(text, text, text)
+-- Function: opennoms.regex_replace(text, text, text)
 
--- DROP FUNCTION macnoms.regex_replace(text, text, text);
+-- DROP FUNCTION opennoms.regex_replace(text, text, text);
 
-CREATE OR REPLACE FUNCTION macnoms.regex_replace(text, text, text)
+CREATE OR REPLACE FUNCTION opennoms.regex_replace(text, text, text)
   RETURNS text AS
 $BODY$$return = $_[0];
 $regex=$_[1];
@@ -467,7 +467,7 @@ $return =~ s/$regex/$to/i;
 return $return;$BODY$
   LANGUAGE plperl VOLATILE
   COST 100;
-ALTER FUNCTION macnoms.regex_replace(text, text, text) OWNER TO postgres;
+ALTER FUNCTION opennoms.regex_replace(text, text, text) OWNER TO postgres;
 
 
 -- Function: opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text)

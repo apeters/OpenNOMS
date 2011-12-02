@@ -1,4 +1,31 @@
-﻿-- View: opennoms.operations_view
+﻿-- View: opennoms.realtime_lines_view
+
+-- DROP VIEW opennoms.realtime_lines_view;
+
+CREATE OR REPLACE VIEW opennoms.realtime_lines_view AS 
+        (         SELECT realtime_lines.id AS opnum, realtime_lines.stime, realtime_lines.etime, realtime_lines.etime AS runwaytime, realtime_lines.actype, actype.mactype, "substring"(realtime_lines.destination, '...$'::text) AS airport, 'A' AS adflag, NULL::unknown AS macad, NULL::unknown AS runway, "substring"(realtime_lines.acid, 1, 3) AS airline, realtime_lines.beacon::smallint AS beacon, realtime_lines.acid AS flight_id, realtime_lines.etime::time without time zone >= '22:30:00'::time without time zone OR realtime_lines.etime::time without time zone < '06:00:00'::time without time zone AS night, realtime_lines.etime::time without time zone >= '22:00:00'::time without time zone OR realtime_lines.etime::time without time zone < '07:00:00'::time without time zone AS inmnight, mactype.opertype, mactype.stage, mactype.image, mactype.manufactured, mactype.takeoffnoise, mactype.description, realtime_lines.departure AS otherport, realtime_lines.the_geom AS targets
+                   FROM opennoms.realtime_lines
+              LEFT JOIN alias.actype USING (actype)
+         LEFT JOIN alias.mactype USING (mactype)
+        WHERE opennoms.macairport(realtime_lines.destination)
+        UNION ALL 
+                 SELECT realtime_lines.id AS opnum, realtime_lines.stime, realtime_lines.etime, realtime_lines.stime AS runwaytime, realtime_lines.actype, actype.mactype, "substring"(realtime_lines.departure, '...$'::text) AS airport, 'D' AS adflag, NULL::unknown AS macad, NULL::unknown AS runway, "substring"(realtime_lines.acid, 1, 3) AS airline, realtime_lines.beacon::smallint AS beacon, realtime_lines.acid AS flight_id, realtime_lines.stime::time without time zone >= '22:30:00'::time without time zone OR realtime_lines.stime::time without time zone < '06:00:00'::time without time zone AS night, realtime_lines.stime::time without time zone >= '22:00:00'::time without time zone OR realtime_lines.stime::time without time zone < '07:00:00'::time without time zone AS inmnight, mactype.opertype, mactype.stage, mactype.image, mactype.manufactured, mactype.takeoffnoise, mactype.description, realtime_lines.destination AS otherport, realtime_lines.the_geom AS targets
+                   FROM opennoms.realtime_lines
+              LEFT JOIN alias.actype USING (actype)
+         LEFT JOIN alias.mactype USING (mactype)
+        WHERE opennoms.macairport(realtime_lines.departure))
+UNION ALL 
+         SELECT realtime_lines.id AS opnum, realtime_lines.stime, realtime_lines.etime, realtime_lines.stime AS runwaytime, realtime_lines.actype, actype.mactype, "substring"(realtime_lines.departure, '...$'::text) AS airport, 'O' AS adflag, NULL::unknown AS macad, NULL::unknown AS runway, "substring"(realtime_lines.acid, 1, 3) AS airline, realtime_lines.beacon::smallint AS beacon, realtime_lines.acid AS flight_id, realtime_lines.stime::time without time zone >= '22:30:00'::time without time zone OR realtime_lines.stime::time without time zone < '06:00:00'::time without time zone AS night, realtime_lines.stime::time without time zone >= '22:00:00'::time without time zone OR realtime_lines.stime::time without time zone < '07:00:00'::time without time zone AS inmnight, mactype.opertype, mactype.stage, mactype.image, mactype.manufactured, mactype.takeoffnoise, mactype.description, realtime_lines.destination AS otherport, realtime_lines.the_geom AS targets
+           FROM opennoms.realtime_lines
+      LEFT JOIN alias.actype USING (actype)
+   LEFT JOIN alias.mactype USING (mactype)
+  WHERE (realtime_lines.destination IS NULL OR opennoms.macairport(realtime_lines.destination) = false) AND (realtime_lines.departure IS NULL OR opennoms.macairport(realtime_lines.departure) = false);
+
+ALTER TABLE opennoms.realtime_lines_view OWNER TO postgres;
+
+
+
+-- View: opennoms.operations_view
 
 -- DROP VIEW opennoms.operations_view;
 
@@ -116,30 +143,18 @@ ALTER TABLE opennoms.operations_view OWNER TO postgres;
 
 
 
--- View: opennoms.realtime_lines_view
-
--- DROP VIEW opennoms.realtime_lines_view;
-
-CREATE OR REPLACE VIEW opennoms.realtime_lines_view AS 
-        (         SELECT realtime_lines.id AS opnum, realtime_lines.stime, realtime_lines.etime, realtime_lines.etime AS runwaytime, realtime_lines.actype, actype.mactype, "substring"(realtime_lines.destination, '...$'::text) AS airport, 'A' AS adflag, NULL::unknown AS macad, NULL::unknown AS runway, "substring"(realtime_lines.acid, 1, 3) AS airline, realtime_lines.beacon::smallint AS beacon, realtime_lines.acid AS flight_id, realtime_lines.etime::time without time zone >= '22:30:00'::time without time zone OR realtime_lines.etime::time without time zone < '06:00:00'::time without time zone AS night, realtime_lines.etime::time without time zone >= '22:00:00'::time without time zone OR realtime_lines.etime::time without time zone < '07:00:00'::time without time zone AS inmnight, mactype.opertype, mactype.stage, mactype.image, mactype.manufactured, mactype.takeoffnoise, mactype.description, realtime_lines.departure AS otherport, realtime_lines.the_geom AS targets
-                   FROM opennoms.realtime_lines
-              LEFT JOIN alias.actype USING (actype)
-         LEFT JOIN alias.mactype USING (mactype)
-        WHERE opennoms.macairport(realtime_lines.destination)
-        UNION ALL 
-                 SELECT realtime_lines.id AS opnum, realtime_lines.stime, realtime_lines.etime, realtime_lines.stime AS runwaytime, realtime_lines.actype, actype.mactype, "substring"(realtime_lines.departure, '...$'::text) AS airport, 'D' AS adflag, NULL::unknown AS macad, NULL::unknown AS runway, "substring"(realtime_lines.acid, 1, 3) AS airline, realtime_lines.beacon::smallint AS beacon, realtime_lines.acid AS flight_id, realtime_lines.stime::time without time zone >= '22:30:00'::time without time zone OR realtime_lines.stime::time without time zone < '06:00:00'::time without time zone AS night, realtime_lines.stime::time without time zone >= '22:00:00'::time without time zone OR realtime_lines.stime::time without time zone < '07:00:00'::time without time zone AS inmnight, mactype.opertype, mactype.stage, mactype.image, mactype.manufactured, mactype.takeoffnoise, mactype.description, realtime_lines.destination AS otherport, realtime_lines.the_geom AS targets
-                   FROM opennoms.realtime_lines
-              LEFT JOIN alias.actype USING (actype)
-         LEFT JOIN alias.mactype USING (mactype)
-        WHERE opennoms.macairport(realtime_lines.departure))
-UNION ALL 
-         SELECT realtime_lines.id AS opnum, realtime_lines.stime, realtime_lines.etime, realtime_lines.stime AS runwaytime, realtime_lines.actype, actype.mactype, "substring"(realtime_lines.departure, '...$'::text) AS airport, 'O' AS adflag, NULL::unknown AS macad, NULL::unknown AS runway, "substring"(realtime_lines.acid, 1, 3) AS airline, realtime_lines.beacon::smallint AS beacon, realtime_lines.acid AS flight_id, realtime_lines.stime::time without time zone >= '22:30:00'::time without time zone OR realtime_lines.stime::time without time zone < '06:00:00'::time without time zone AS night, realtime_lines.stime::time without time zone >= '22:00:00'::time without time zone OR realtime_lines.stime::time without time zone < '07:00:00'::time without time zone AS inmnight, mactype.opertype, mactype.stage, mactype.image, mactype.manufactured, mactype.takeoffnoise, mactype.description, realtime_lines.destination AS otherport, realtime_lines.the_geom AS targets
-           FROM opennoms.realtime_lines
-      LEFT JOIN alias.actype USING (actype)
-   LEFT JOIN alias.mactype USING (mactype)
-  WHERE (realtime_lines.destination IS NULL OR opennoms.macairport(realtime_lines.destination) = false) AND (realtime_lines.departure IS NULL OR opennoms.macairport(realtime_lines.departure) = false);
-
-ALTER TABLE opennoms.realtime_lines_view OWNER TO postgres;
 
 
+-- View: opennoms.getevents_view
+
+-- DROP VIEW opennoms.getevents_view;
+
+CREATE OR REPLACE VIEW opennoms.getevents_view AS 
+ SELECT noisematch.eventid, noisematch.opnum, rmts.rmt, events.stime::timestamp without time zone AS stime, events.mtime::timestamp without time zone AS mtime, events.duration, events.leq, events.sel, events.lmax, round(events.lmax / 7::double precision) AS radius, astext(rmts.the_geom) AS wkt
+   FROM opennoms.noisematch
+   JOIN opennoms.events USING (eventid)
+   JOIN opennoms.rmts USING (rmt)
+  WHERE noisematch.valid;
+
+ALTER TABLE opennoms.getevents_view OWNER TO postgres;
 
