@@ -121,10 +121,7 @@
             width: 375,
             height: 320,
             layout: 'card',
-            items: [{
-                xtype: 'panel',
-                title: 'Noise Event Information',
-                html: '',
+            items: [Ext.create('OpenNoms.widgets.NoiseEventViewer', {
                 tools: [{
                     type: 'close',
                     handler: function (event, toolEl, panel) {
@@ -132,7 +129,7 @@
                     },
                     scope: this
                 }]
-            }, {
+            }), {
                 xtype: 'panel',
                 title: 'Legend',
                 html: '',
