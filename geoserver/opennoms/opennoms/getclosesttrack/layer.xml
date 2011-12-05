@@ -1,0 +1,13 @@
+<layer>
+  <name>getclosesttrack</name>
+  <id>LayerInfoImpl--19376d34:133fbbd69ac:1eb5</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--19376d34:133fbbd69ac:1eb4</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

@@ -23,7 +23,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
           <LineSymbolizer>
             <Stroke>
               <CssParameter name="stroke">
-                <ogc:Literal>#c06666</ogc:Literal>
+                <ogc:Literal>#960000</ogc:Literal>
               </CssParameter>
               <CssParameter name="stroke-width">
                 <ogc:Literal>2</ogc:Literal>
@@ -44,7 +44,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
           <LineSymbolizer>
             <Stroke>
               <CssParameter name="stroke">
-                <ogc:Literal>#73c973</ogc:Literal>
+                <ogc:Literal>#14a514</ogc:Literal>
               </CssParameter>
               <CssParameter name="stroke-width">
                 <ogc:Literal>2</ogc:Literal>
@@ -66,7 +66,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
           <LineSymbolizer>
             <Stroke>
               <CssParameter name="stroke">
-                <ogc:Literal>#6666c0</ogc:Literal>
+                <ogc:Literal>#000096</ogc:Literal>
               </CssParameter>
               <CssParameter name="stroke-width">
                 <ogc:Literal>2</ogc:Literal>
