@@ -62,14 +62,9 @@ OpenNoms.app = {
 
         this.appPanel.appHeader.on({
             'setdatetimerange': function () {
-                this.queryController.updateQuery(this.appPanel.mapPanel);
+                this.queryController.updateQuery(this.appPanel.mapPanel.staticflightlayer);
             },
             scope: this
-        });
-
-        this.queryController.on({
-            'queryupdated': this.appPanel.mapPanel,
-            scope: this.queryController
         });
 
         this.appPanel.mapPanel.on({
@@ -96,7 +91,8 @@ OpenNoms.app = {
                         store.add({ 'name': layer.name, 'layer': layer, 'isOn': layer.getVisibility() });
                         layer.events.on({
                             'visibilitychanged': function (e) {
-                                var index = store.find('layer', layer);
+                                var store = Ext.getCmp('legend-grid').store;
+                                var index = store.findExact('layer', e.object);
                                 if (index > -1) {
                                     var rec = store.getAt(index);
                                     if (rec.get('isOn') != layer.getVisibility()) {
@@ -119,7 +115,6 @@ OpenNoms.app = {
                     },
                     scope: this
                 });
-                //this.queryController.updateQuery();
             },
             scope: this
         });
@@ -171,12 +166,20 @@ OpenNoms.app = {
             scope: this
         });
 
-        Ext.getCmp('legend-grid').store.on({
-            'update': function (store, record, operation, opts) {
-                var layer = record.get('layer');
-                if (record.get('isOn') != layer.getVisibility()) {
-                    layer.setVisibility(record.get('isOn'));
+        Ext.getCmp('legend-grid').on({
+            'checkchange': function (grid, index, checked) {
+                var layer = grid.store.getAt(index).get('layer');
+                if (checked != layer.getVisibility()) {
+                    layer.setVisibility(checked);
                 }
+            },
+            scope: this
+        });
+
+        Ext.getCmp('select-flights').store.on({
+            'load': function (store, record, operation, opts) {
+                this.queryController.updateQuery(this.appPanel.mapPanel.staticflightlayer);
+                this.appPanel.mapPanel.staticflightlayer.setVisibility(true);
             },
             scope: this
         });
@@ -189,6 +192,7 @@ OpenNoms.app = {
     */
     loadData: function () {
         Ext.getCmp('noise-event-viewer').store.load();
+        Ext.getCmp('select-flights').store.load();
     },
 
     initControllers: function () {

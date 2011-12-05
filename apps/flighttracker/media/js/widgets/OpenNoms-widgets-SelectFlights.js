@@ -14,7 +14,7 @@
             proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
                 url: url
             }),
-            autoLoad: true,
+            autoLoad: false,
             listeners: {
                 'update': function (store, record, operation, opts) {
                     var group = record.get('group');

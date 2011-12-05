@@ -12,10 +12,10 @@
     },
 
 
-    updateQuery: function (mapPanel) {
+    updateQuery: function (layer) {
         // here we'd get the time values for example and update the static flight track
         // for now lets just do this until we understand the time picker better
-        mapPanel.staticflightlayer.mergeNewParams({ viewparams: this.formatParamsForGeoserver() });
+        layer.mergeNewParams({ viewparams: this.formatParamsForGeoserver() });
     },
 
 

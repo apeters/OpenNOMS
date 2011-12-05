@@ -58,6 +58,38 @@
             buffer: 0,
             showInLegend: true
         });
+
+        
+        //tiled version of contours from MapProxy
+        this.tmscontours = new OpenLayers.Layer.TMS(
+	        "2007 Forecast Year Mitigated DNL Contours",
+	        "http://app.macnoise.com/mapproxy/tms/",
+	        {
+                layername:'contours_EPSG26915',
+                type:'png',
+                tileSize:new OpenLayers.Size(512,512),
+                opacity:0.7,
+                buffer:0,
+                showInLegend: true,
+                visibility: false
+	        }
+        );
+
+        //tiled version of RMTS from MapProxy
+        this.tmsrmts = new OpenLayers.Layer.TMS(
+	        "Remote Monitoring Towers",
+	        "http://app.macnoise.com/mapproxy/tms/",
+	        {
+                layername:'rmts_EPSG26915',
+                type:'png',
+                tileSize:new OpenLayers.Size(512,512),
+                opacity:0.7,
+                buffer:0,
+                showInLegend: true,
+                visibility: false
+	        }
+        );
+
  
         //static flight track layer
         this.staticflightlayer = new OpenLayers.Layer.WMS("Static Flight Tracks", "http://localhost:8080/geoserver/opennoms/wms", { 
@@ -70,7 +102,9 @@
             maxExtent: new OpenLayers.Bounds(411482, 4900449, 552143, 5041149), 
             maxResolution: 274.8046875, 
             opacity: 0.6, 
-            displayInLayerSwitcher: false
+            displayInLayerSwitcher: false,
+            visibility: false
+
         });
 
         this.zoomPanel = Ext.create('Ext.panel.Panel', {
@@ -175,7 +209,7 @@
             }
         );
 
-        this.map.addLayers([this.tmsbase, this.staticflightlayer, this.noiseEventLayer, this.measureLayer]);
+        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.noiseEventLayer, this.measureLayer]);
 
         this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
             multiple: false, 
