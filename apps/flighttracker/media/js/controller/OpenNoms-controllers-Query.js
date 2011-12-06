@@ -7,17 +7,24 @@
             "queryupdated": true
         });
 
+        this.joinString = '\\,';
+
         // Call our superclass constructor to complete construction process.
         this.callParent(arguments)
     },
 
 
-    updateQuery: function (layer) {
+    updateLayerWithNewParams: function (layer) {
         // here we'd get the time values for example and update the static flight track
         // for now lets just do this until we understand the time picker better
         layer.mergeNewParams({ viewparams: this.formatParamsForGeoserver() });
     },
 
+    getAniatedFlightData: function () {
+        Ext.Ajax.request({
+
+        });
+    },
 
     getFlightParams: function () {
         var flights = Ext.getCmp('select-flights');
@@ -33,7 +40,7 @@
             }
         }, this);
 
-        params.airline = arr.join(',');
+        params.airline = arr.join(this.joinString);
         arr = [];
 
         // get the selected adflags 
@@ -44,7 +51,7 @@
             }
         }, this);
 
-        params.adflag = arr.join(',');
+        params.adflag = arr.join(this.joinString);
         arr = [];
 
         // get the selected runways 
@@ -55,7 +62,7 @@
             }
         }, this);
 
-        params.runway = arr.join(',');
+        params.runway = arr.join(this.joinString);
         arr = [];
 
         return params;
