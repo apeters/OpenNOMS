@@ -54,20 +54,31 @@
                 xtype: 'combo',
                 triggerCls: 'x-form-search-trigger',
                 name: 'mapsearch',
-                store: Ext.create('Ext.data.Store', {
-                    fields: ['id', 'name'],
-                    data: [
-                        { "id": 0, "name": "Address 1" },
-                        { "id": 1, "name": "Address 2" },
-                        { "id": 2, "name": "Address 3" }
-                    ]
-                }),
-                queryMode: 'local',
-                displayField: 'name',
-                valueField: 'id',
                 emptyText: 'Find an Address',
                 width: 425,
-                style: 'padding-left: 76px; padding-top: 8px;'
+                style: 'padding-left: 76px; padding-top: 8px;',
+                loadingText: 'Searching...',
+                zoom: 5,
+                minChars: 5,
+                tpl: '<tpl for="."><div class="x-combo-list-item"><h3>{fulladdwcity}<br></h3></div></tpl>',
+                hideTrigger: false,
+                displayField: 'fulladdwcity',
+                forceSelection: true,
+                queryParam: 'query',
+                store: Ext.create('Ext.data.Store', {
+                    fields: ['fulladdress', 'fulladdwcity', 'city', 'zip', 'lon', 'lat', 'x', 'y'],
+                    proxy: {
+                        type: 'ajax',
+                        url: OpenNoms.config.URLs.geocodeSearch,
+                        extraParams: {
+                            maxRows: '20'
+                        },
+                        reader: {
+                            type: 'json',
+                            root: 'items'
+                        }
+                    }
+                })
             }, {
                 xtype: 'container',
                 flex: 1
