@@ -62,7 +62,7 @@ OpenNoms.app = {
 
         this.appPanel.appHeader.on({
             'setdatetimerange': function () {
-                this.queryController.updateQuery(this.appPanel.mapPanel.staticflightlayer);
+                this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
             },
             scope: this
         });
@@ -178,7 +178,7 @@ OpenNoms.app = {
 
         Ext.getCmp('select-flights').store.on({
             'load': function (store, record, operation, opts) {
-                this.queryController.updateQuery(this.appPanel.mapPanel.staticflightlayer);
+                this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
                 this.appPanel.mapPanel.staticflightlayer.setVisibility(true);
             },
             scope: this
