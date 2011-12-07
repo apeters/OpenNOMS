@@ -158,3 +158,37 @@ CREATE OR REPLACE VIEW opennoms.getevents_view AS
 
 ALTER TABLE opennoms.getevents_view OWNER TO postgres;
 
+
+
+--
+-- Name: realtimepoint; Type: VIEW; Schema: macnoms; Owner: -
+--
+
+-- DROP VIEW opennoms.realtimepoint;
+
+--CREATE VIEW opennoms.realtimepoint AS
+--    SELECT bar.opnum, bar.actype, bar.adflag, bar.airline, bar.flight_id, bar.pointn, bar.x, bar.y, bar.z, bar.t, bar.heading, bar.speed 
+--    FROM (
+--	SELECT foo.tracknumber AS opnum, foo.actype, 
+--		CASE WHEN (foo.departure = 'KMSP'::text) THEN 'D'::text WHEN (foo.destination = 'KMSP'::text) THEN 'A'::text ELSE 'O'::text END AS adflag, 
+--		CASE WHEN (foo.acid !~* 'N'::text) THEN "substring"(foo.acid, 1, 3) ELSE ''::text END AS airline, 
+--		foo.acid AS flight_id, 1 AS pointn, round(public.st_x(foo.p)) AS x, round(public.st_y(foo.p)) AS y, 
+--		round((public.st_z(foo.p) * (3.2808399)::double precision)) AS z, 
+--		(round(date_part('epoch'::text, foo.t)) * (1000)::double precision) AS t, 
+--		(round((mac_heading(public.st_startpoint(foo.seg), foo.p, public.st_endpoint(foo.seg)) / (10.0)::double precision)) * (10)::double precision) AS heading, 
+--		round(((public.st_length(foo.seg) / (public.st_m(public.st_endpoint(foo.seg)) - public.st_m(public.st_startpoint(foo.seg)))) * (2.23693629)::double precision)) AS speed 
+--	FROM (
+--		SELECT realtime_lines.tracknumber, realtime_lines.tailnumber, realtime_lines.beacon, realtime_lines.the_geom, realtime_lines.stime, realtime_lines.etime, 
+--			realtime_lines.acid, realtime_lines.actype, realtime_lines.departure, realtime_lines.destination, realtime_lines.id, t.t, 
+--			public.st_locate_between_measures(realtime_lines.the_geom, date_part('epoch'::text, ((t.t - realtime_lines.stime) - '00:00:10'::interval)), 
+--			date_part('epoch'::text, ((t.t - realtime_lines.stime) + '00:00:10'::interval))) AS seg, public.st_locate_along_measure(realtime_lines.the_geom, 
+--			date_part('epoch'::text, (t.t - realtime_lines.stime))) AS p 
+--		FROM opennoms.realtime_lines, (SELECT (now() - '00:15:30'::interval) AS t) t 
+--		WHERE ((public.period_cc(realtime_lines.stime, realtime_lines.etime) OPERATOR(public.&&) public.period_cc((t.t - '00:00:10'::interval), 
+--			(t.t + '00:00:10'::interval))) AND 
+--			(public.st_geometrytype(public.st_locate_along_measure(realtime_lines.the_geom, date_part('epoch'::text, (t.t - realtime_lines.stime)))) = 'ST_Point'::text))
+--	) foo
+--    ) bar 
+--    WHERE ((bar.z > (59)::double precision) AND (bar.speed > (50)::double precision));
+
+--ALTER TABLE opennoms.realtimepoint OWNER TO postgres;

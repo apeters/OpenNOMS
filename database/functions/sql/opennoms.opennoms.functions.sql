@@ -696,23 +696,26 @@ ALTER FUNCTION opennoms.mac_speed(geometry, geometry, geometry, geometry, geomet
 
 -- Function: opennoms.mac_dumppoints_web(geometry, timestamp with time zone, integer)
 
-DROP FUNCTION opennoms.mac_dumppoints_web2(geometry, timestamp with time zone, integer);
+-- DROP FUNCTION opennoms.mac_dumppoints_web2(geometry, timestamp with time zone, integer);
 
 CREATE OR REPLACE FUNCTION opennoms.mac_dumppoints_web2(IN geometry, IN timestamp with time zone, IN step integer)
   RETURNS SETOF text AS
 $BODY$
-	select '{p:' || path || ',x:' || x || ',y:' || y || ',z:' || z || ',t:''' || "time" || ''',h:' || heading || ',s:' || speed || '}' from (select 
-		path[1] as path,
-		round(st_x(geom))::int as x,
-		round(st_y(geom))::int as y,
-		round(st_z(geom)*3.2808399)::int as z,
-		(st_m(geom)::text || ' seconds')::interval + $2 as "time",
-		round(opennoms.mac_heading(lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over ())/10.0)::int * 10 as heading,
-		round(opennoms.mac_speed(lag(geom,3) over (),lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over (),lead(geom,3) over ())*2.236936)::int as speed
-	from st_dumppoints(opennoms.everynseconds($1,$3)) 
-	--where 
-	--extract(epoch from ((st_m(geom))::text || ' seconds')::interval + $2)::int % $3 = 0 
-	) as foo where z>59 and speed >50
+
+	SELECT '{p:' || path || ',x:' || x || ',y:' || y || ',z:' || z || ',t:''' || "time" || ''',h:' || heading || ',s:' || speed || '}' 
+	FROM (
+		SELECT 
+			path[1] as path,
+			round(st_x(geom))::int as x,
+			round(st_y(geom))::int as y,
+			round(st_z(geom)*3.2808399)::int as z,
+			(st_m(geom)::text || ' seconds')::interval + $2 as "time",
+			round(opennoms.mac_heading(lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over ())/10.0)::int * 10 as heading,
+			round(opennoms.mac_speed(lag(geom,3) over (),lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over (),lead(geom,3) over ())*2.236936)::int as speed
+		FROM st_dumppoints(opennoms.everynseconds($1,$3)) 
+	) AS foo 
+	WHERE z>59 and speed >50
+
  $BODY$
   LANGUAGE sql VOLATILE
   COST 100
