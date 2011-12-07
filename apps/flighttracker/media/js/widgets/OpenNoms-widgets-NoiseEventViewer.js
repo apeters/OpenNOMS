@@ -6,7 +6,7 @@
     title: 'Noise Event Information',
 
     initComponent: function () {
-        var url = OpenNoms.config.URLs.getNoiseEventData;
+        var url = OpenNoms.config.URLs.ows;
         this.store = Ext.create('Ext.data.Store', {
             fields: [
                 { name: 'eventid', type: 'number' },
@@ -22,7 +22,15 @@
                 { name: 'wkt', type: 'string' }
             ],
             proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
-                url: url
+                url: url,
+                extraParams: {
+                    'service': 'WFS',
+                    'version': '1.0.0',
+                    'request': 'GetFeature',
+                    'typeName': 'opennoms:getevents',
+                    'maxFeatures': '50',
+                    'outputFormat': 'json'
+                }
             })
         });
 

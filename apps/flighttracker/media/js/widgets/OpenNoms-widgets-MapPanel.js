@@ -10,7 +10,8 @@
         this.addEvents({
             'distancemeasurecomplete': true,
             'areameasurecomplete': true,
-            'mapready': true
+            'mapready': true,
+            'mapclicked': true
         });
 
         this.wktFormat = new OpenLayers.Format.WKT();
@@ -166,15 +167,6 @@
             }
         );
 
-//        var noiseEventStyle = OpenLayers.Util.applyDefaults({
-//            strokeColor: "#FFFF00",
-//            strokeOpacity: 1,
-//            strokeWidth: 4,
-//            pointRadius: 10,
-//            graphicName: 'circle',
-//            fillOpacity: 0
-//        }, OpenLayers.Feature.Vector.style["default"]);
-
         var noiseEventStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
                 strokeColor: "#FFFF00",
@@ -271,6 +263,24 @@
         );
 
         this.map.addControls([this.drawAreaMeasureControl, this.drawDistanceMeasureControl]);
+
+        this.clickControl = new OpenLayers.Control({
+            handler: new OpenLayers.Handler.Click(
+                this, {
+                    'click': function(e) {
+                        this.fireEvent('mapclicked', e);
+                    }
+                }, {
+                    'single': true,
+                    'double': false,
+                    'pixelTolerance': 0,
+                    'stopSingle': false,
+                    'stopDouble': false
+                })
+        });
+
+        this.map.addControl(this.clickControl);
+        this.clickControl.activate();
 
         this.mousePosition = new OpenLayers.Control.MousePosition({
             element: Ext.get('cursor-position').dom
