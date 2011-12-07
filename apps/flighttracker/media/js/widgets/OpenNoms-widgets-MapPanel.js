@@ -260,7 +260,20 @@
             }
         );
 
-        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.animatedFlightTracks, this.noiseEventLayer, this.measureLayer]);
+        var selectedFlightTrackStyle = new OpenLayers.StyleMap({
+            "default": new OpenLayers.Style({
+                strokeColor: "#FFFF00",
+                strokeOpacity: 1,
+                strokeWidth: 4,
+            })
+        });
+
+        this.selectedFlightTrackLayer = new OpenLayers.Layer.Vector(
+            "SelectedFlightTrackLayer", {
+                styleMap: selectedFlightTrackStyle
+            }
+        );
+
         var addressSearchStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
                 externalGraphic: 'Media/images/SearchResult.png',
@@ -283,7 +296,7 @@
             }
         );
 
-        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
+        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.selectedFlightTrackLayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
 
         this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
             multiple: false, 
