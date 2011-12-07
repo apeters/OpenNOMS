@@ -10,7 +10,8 @@
         this.addEvents({
             'distancemeasurecomplete': true,
             'areameasurecomplete': true,
-            'mapready': true
+            'mapready': true,
+            'mapclicked': true
         });
 
         this.wktFormat = new OpenLayers.Format.WKT();
@@ -225,15 +226,6 @@
             }
         );
 
-//        var noiseEventStyle = OpenLayers.Util.applyDefaults({
-//            strokeColor: "#FFFF00",
-//            strokeOpacity: 1,
-//            strokeWidth: 4,
-//            pointRadius: 10,
-//            graphicName: 'circle',
-//            fillOpacity: 0
-//        }, OpenLayers.Feature.Vector.style["default"]);
-
         var noiseEventStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
                 strokeColor: "#FFFF00",
@@ -269,6 +261,29 @@
         );
 
         this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.animatedFlightTracks, this.noiseEventLayer, this.measureLayer]);
+        var addressSearchStyle = new OpenLayers.StyleMap({
+            "default": new OpenLayers.Style({
+                externalGraphic: 'Media/images/SearchResult.png',
+                graphicWidth: 32,
+                graphicHeight: 37,
+                graphicOpacity: 1,
+                graphicXOffset: -16,
+                graphicYOffset: -37,
+                backgroundGraphic: 'Media/images/shadow.png',
+                backgroundXOffset: -16,
+                backgroundYOffset: -37,
+                backgroundHeight: 37,
+                backgroundWidth: 51
+            })
+        });
+
+        this.addressSearchLayer = new OpenLayers.Layer.Vector(
+            "AddressSearchLayer", {
+                styleMap: addressSearchStyle
+            }
+        );
+
+        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
 
         this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
             multiple: false, 
@@ -308,6 +323,24 @@
         );
 
         this.map.addControls([this.drawAreaMeasureControl, this.drawDistanceMeasureControl]);
+
+        this.clickControl = new OpenLayers.Control({
+            handler: new OpenLayers.Handler.Click(
+                this, {
+                    'click': function(e) {
+                        this.fireEvent('mapclicked', e);
+                    }
+                }, {
+                    'single': true,
+                    'double': false,
+                    'pixelTolerance': 0,
+                    'stopSingle': false,
+                    'stopDouble': false
+                })
+        });
+
+        this.map.addControl(this.clickControl);
+        this.clickControl.activate();
 
         this.mousePosition = new OpenLayers.Control.MousePosition({
             element: Ext.get('cursor-position').dom

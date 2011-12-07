@@ -7,12 +7,19 @@
     hideHeaders: true,
 
     initComponent: function () {
-        var url = OpenNoms.config.URLs.selectFlightsDomainData;
         this.store = Ext.create('Ext.data.Store', {
             fields: ['group', 'name', 'value', 'ischecked'],
             groupField: 'group',
             proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
-                url: url
+                url: OpenNoms.config.URLs.ows,
+                extraParams: {
+                    'service': 'WFS',
+                    'version': '1.0.0',
+                    'request': 'GetFeature',
+                    'typeName': 'opennoms:advanced_query_choices',
+                    'maxFeatures': '50',
+                    'outputFormat': 'json'
+                }
             }),
             autoLoad: false,
             listeners: {
