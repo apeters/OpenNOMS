@@ -1,0 +1,428 @@
+
+/** api: constructor
+*  .. class:: TrackAnimator
+*/
+Ext.define('OpenNoms.widgets.TrackAnimator', {
+    extend: 'Ext.container.Container',
+    alias: 'widget.opennoms-widgets-trackanimator',
+
+    layout: {
+        type: 'hbox'
+    },
+
+    /** api: config[textReset]
+    *  ``String``
+    *  Text to be displayed as a tooltip for the animation reset button.
+    *  Default is "reset".
+    */
+    textReset: "reset",
+
+    /** api: config[textPlay]
+    *  ``String``
+    *  Text to be displayed as a tooltip for the animation play button.
+    *  Default is "play".
+    */
+    textPlay: "play",
+
+    /** api: config[textStop]
+    *  ``String``
+    *  Text to be displayed as a tooltip for the animation stop button.
+    *  Default is "stop".
+    */
+    textStop: "stop",
+
+    /** api: config[textRepeat]
+    *  ``String``
+    *  Text to be displayed as a tooltip for the animation repeat button.
+    *  Default is "reset".
+    */
+    textRepeat: "repeat",
+
+    /** api: config[url]
+    *  ``String``
+    *  URL for requesting track features.  If not provided the animator must
+    *  be configured with a ``store``.
+    */
+    url: null,
+
+    /** api: config[protocolOptions]
+    *  ``Object``
+    *  If a ``url`` the HTTP protocol will be used to request features.
+    *  Any options to the HTTP protocol can be specified in this property.
+    */
+    protocolOptions: null,
+
+    /** api: config[formatOptions]
+    *  ``Object``
+    *  If a ``url`` a KML parser will be used to parse requested features.
+    *  Any options to the KML format can be specified in this property.
+    */
+    formatOptions: null,
+
+    /** api: config[store]
+    *  :class:`GeoExt.data.FeatureStore`
+    *  A configured store with features representing track locations.  If
+    *  not provided, the ``url`` property must be given and a store will be
+    *  created.
+    */
+    store: null,
+
+    /** api: config[fields]
+    *  ``Array``
+    *  Optional list of field definitions for records in the store.  If not 
+    *  provided, fields are assumed to be "when" (date), "heading" (number), 
+    *  "tilt" (number), "roll" (number), "altitude" (number), and "trackId"
+    *  (string).
+    */
+    fields: null,
+
+    /** api: config[layer]
+    *  :class:`OpenLayers.Layer.Vector`
+    *  A layer for diplaying tracks.  Features on this layer are managed
+    *  by this component, but the layer should be destroyed manually (it
+    *  is not destroyed when the compoent is destroyed).
+    */
+    layer: null,
+
+    /** api: config[span]
+    *  ``Number``
+    *  The length of track to display (in seconds).  Default is 60.
+    */
+    span: 60,
+
+    /** api: config[speed]
+    *  ``Number``
+    *  Factor by which the animation time is exaggerated.  Default is 10 (the
+    *  animation will play at 10x real time).  The animation must be stopped
+    *  to change this value.
+    */
+    speed: 10,
+
+    /** api: config[frameRate]
+    *  ``Number``
+    *  The number of steps in the animation per second.  Default is 6.  Note
+    *  that your browser will not be able to display very high animation rates.
+    *  The animation must be stopped to change this value.
+    */
+    frameRate: 6,
+
+    /** api: config[repeat]
+    *  ``Boolean``
+    *  Start the animation over when it gets to the end.  Default is false.
+    */
+    repeat: false,
+
+    /** api: config[aggressive]
+    *  ``Boolean``
+    *  Update the display as slider thumb is dragged.  Default is true.  If
+    *  false, the display will only be updated when thumb dragging completes.
+    */
+    aggressive: true,
+
+    /** api: property[playing]
+    *  ``Boolean``
+    *  The animation is currently playing (read-only).
+    */
+    playing: false,
+
+
+    /** private: method[initComponent]
+    */
+    initComponent: function () {
+
+        this.addEvents(
+        /** private: event[load]
+        *  Fires after a new set of Records has been loaded.  Listeners 
+        *  will receive the arguments included in the store load event. 
+        */
+            "load",
+
+        /** private: event[exception]
+        *  Fires if an exception occurs in the Proxy during a remote 
+        *  request.  Listeners will receive the arguments included in the 
+        *  store exception event. 
+        */
+            "exception"
+        );
+
+
+        if (!this.store) {
+
+            var formatOptions = Ext.apply(this.formatOptions || {}, {
+                extractTracks: true
+            });
+
+            //            var protocolOptions = Ext.apply(this.protocolOptions || {}, {
+            //                url: this.url,
+            //                format: new OpenLayers.Format.Text(formatOptions)
+            //            });
+
+            this.store = Ext.create('Ext.data.Store', {
+                fields: this.fields || [
+		              { name: "when", type: "date", dateFormat: 'Y-m-d H:i:s-G' },
+		              { name: "heading", type: "number" },
+		              { name: "altitude", type: "number" },
+		              { name: "actype", type: "string" },
+		              { name: "airline", type: "string" },
+		              { name: "trackId", type: "number", mapping: "opnum" },
+		              { name: "flight_id", type: "string" }
+                ],
+                sortInfo: { field: 'when', direction: 'ASC' },
+                proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
+                    url: this.url
+                }),
+                autoLoad: true,
+                listeners: {
+                    load: function (store) {
+                        this.startTime = Number.POSITIVE_INFINITY;
+                        this.endTime = Number.NEGATIVE_INFINITY;
+                        store.each(function (rec) {
+                            // parse the track details
+                            var trackdetails = Ext.decode(rec.raw.trackdetails);
+                            rec.set('when', trackdetails.t);
+                            rec.set('heading', trackdetails.h);
+                            rec.set('altitude', trackdetails.z);
+
+                            // create an OL point from the track deatils
+                            var wpt = new OpenLayers.Geometry.Point(trackdetails.x, trackdetails.y);
+                            rec.set('feature', new OpenLayers.Feature.Vector(wpt, rec.data));
+
+                            var when = rec.get('when').valueOf();
+                            if (when < this.startTime) {
+                                this.startTime = when;
+                            } if (when > this.endTime) {
+                                this.endTime = when;
+                            }
+                        }, this);
+                        this.shiftTime = this.endTime - 60000;
+                        this.slider.minValue = this.startTime;
+                        this.slider.maxValue = this.endTime;
+                        if (this.slider.getValue() < this.startTime || this.slider.getValue() > this.endTime) {
+                            this.slider.setValue(this.startTime);
+                        }
+
+                        this.updateDisplay();
+                        if (this.store.getCount() <= 1) { this.dateDisplay.update("No Data Available for Selected Date/Time"); }
+                    },
+                    scope: this
+                }
+            });
+        }
+
+        this.relayEvents(this.store, ["load", "exception"]);
+
+        this.dateDisplay = Ext.create('Ext.Component', {
+            cls: "gxux-trackanimator-datedisplay",
+            autoEl: {
+                tag: "div",
+                html: ""
+            }
+        });
+
+        this.playPauseBtn = Ext.create('Ext.Button', {
+            id: 'animationplaybutton',
+            iconCls: 'play',
+            width: 65,
+            text: 'Play',
+            scope: this,
+            enableToggle: true,
+            handler: function () {
+                if (this.playPauseBtn.pressed) {
+                    this.play();
+                    this.playPauseBtn.setText('Pause');
+                    this.playPauseBtn.setIconCls('pause');
+                } else {
+                    this.stop();
+                    this.playPauseBtn.setText('Play');
+                    this.playPauseBtn.setIconCls('play');
+                }
+            }
+        });
+
+        this.slider = Ext.create('Ext.slider.Single', {
+            cls: "gxux-trackanimator-slider",
+            id: 'animationslider',
+            flex: 1,
+            tipText: function (a) {
+                var t = new Date();
+                t.setTime(a.value);
+                return t.toTimeString();
+            },
+            style: 'margin-left: 15px; margin-right: 15px; margin-top: 2px;',
+            listeners: {
+                change: function (slider, newValue, thumb, eOpts) {
+                    if (this.aggressive) {
+                        this.updateDisplay.apply(this, arguments);
+                    }
+                    if (!this.hidden) {
+                        var t = new Date();
+                        t.setTime(newValue);
+                        slider.plugins[0].show();
+                        slider.plugins[0].update(t.toTimeString())
+                        var xy = slider.plugins[0].el.getAlignToXY(thumb.el.id, 'b-t');
+                        xy[1] += -10;
+                        slider.plugins[0].showAt(xy);
+                    }
+                },
+                changecomplete: this.updateDisplay,
+                scope: this
+            }
+        });
+
+        this.speedcombo = Ext.create('Ext.form.ComboBox', {
+            xtype: 'combo',
+            id: 'animationspeedcombo',
+            name: 'animationspeed',
+            value: this.speed,
+            labelWidth: 90,
+            labelAlign: 'right',
+            width: 150,
+            fieldLabel: 'Animation Speed',
+            store: Ext.create('Ext.data.Store', {
+                fields: ['multiplier', 'text'],
+                data: [
+                    { "multiplier": 1, "text": "1 x" },
+                    { "multiplier": 2, "text": "2 x" },
+                    { "multiplier": 4, "text": "4 x" },
+                    { "multiplier": 10, "text": "10 x" },
+                    { "multiplier": 20, "text": "20 x" },
+                    { "multiplier": 30, "text": "30 x" },
+                    { "multiplier": 60, "text": "60 x" }
+                ]
+            }),
+            queryMode: 'local',
+            displayField: 'text',
+            valueField: 'multiplier',
+            listeners: {
+                scope: this,
+                'select': function (c) {
+                    this.stop();
+                    this.speed = c.value;
+                    this.play();
+                }
+            }
+        });
+
+        this.items = [
+            this.playPauseBtn,
+            this.speedcombo,
+            this.slider
+        ];
+
+        this.callParent(arguments);
+    },
+
+    /** private: method[updateDisplay]
+    *  Update displayed features based on slider value.
+    */
+    updateDisplay: function () {
+
+        var maxTime = this.slider.getValue();
+        var minTime = maxTime - (this.span * 1000);
+
+        var trackIds = {};
+        this.store.filterBy(function (rec) {
+            var when = rec.get("when").getTime();
+            //console.log(when);
+            var include = minTime <= when && maxTime >= when;
+            if (include) {
+                var trackId = rec.get("trackId");
+                var feature = rec.data.feature;
+                //console.log(trackId,feature);
+                var obj = trackIds[trackId];
+                if (!obj) {
+                    obj = { points: [] };
+                    trackIds[trackId] = obj;
+                }
+                obj.points.push(feature.geometry);
+                obj.attributes = feature.attributes;
+                //console.log(obj);
+            }
+            return include;
+        });
+        if (this.layer) {
+            this.layer.removeAllFeatures();
+            var tracks = [];
+            var heads = [];
+            var obj;
+            for (var trackId in trackIds) {
+                obj = trackIds[trackId];
+                tracks.push(new OpenLayers.Feature.Vector(
+                    new OpenLayers.Geometry.LineString(obj.points),
+                    obj.attributes
+                ));
+                heads.push(new OpenLayers.Feature.Vector(
+                    obj.points[obj.points.length - 1].clone(),
+                    obj.attributes
+                ));
+            }
+            this.layer.addFeatures(tracks.concat(heads));
+        }
+
+        this.updateDateDisplay(new Date(maxTime));
+
+    },
+
+    /** api: config[updateDateDisplay]
+    *  ``Function``
+    *  To customize the display of the current date, provide a method that
+    *  accepts a Date instance and returns text or html.
+    */
+    updateDateDisplay: function (date) {
+        //alert(date);
+        if (date && date != "Invalid Date" && date !== 0 && !isNaN(date)) {
+            // this.dateDisplay.update(date.format("Y-m-d h:i:s A"));
+        } else {
+            //  this.dateDisplay.update("No Data Available for Selected Time");
+        }
+    },
+
+    /** api: method[play]
+    *  Start playing the animation.
+    */
+    play: function () {
+        if (this.playing) {
+            this.slider.setValue(this.startTime);
+        } else {
+            this.playing = true;
+            var interval = 1000 / this.frameRate;
+            var increment = this.speed * interval;
+            function step() {
+                var more = true;
+                var time = this.slider.getValue() + increment;
+                if (time > this.endTime) {
+                    if (this.repeat) {
+                        this.slider.setValue(this.startTime);
+                    } else {
+                        this.slider.setValue(this.startTime);
+                        this.stop();
+                        more = false;
+                    }
+                } else {
+                    this.slider.setValue(time);
+                }
+                return more;
+            }
+            if (step.call(this)) {
+                this.timerId = window.setInterval(Ext.bind(step, this), interval);
+            }
+        }
+    },
+
+    /** api: method[stop]
+    *  Stop playing the animation.
+    */
+    stop: function () {
+        window.clearInterval(this.timerId);
+        this.playing = false;
+    },
+
+    /** api: method[reset]
+    *  Stop playing and reset the animation.
+    */
+    reset: function () {
+        this.stop();
+        this.slider.setValue(this.startTime);
+    }
+
+});

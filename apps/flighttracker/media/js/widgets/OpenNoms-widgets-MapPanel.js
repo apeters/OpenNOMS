@@ -107,6 +107,65 @@
 
         });
 
+          
+        //style to be used for display of replay tracks and real time points
+        this.animatedFlightTrackStyle = new OpenLayers.Style(null, {
+            rules: [
+                new OpenLayers.Rule({
+                    symbolizer: {
+                        "Point": {
+                            pointRadius: 12,
+                            graphicName: "circle",
+                            //rotation: "${heading}",
+                            fillColor: "white",
+                            fillOpacity: 1,
+                            strokeWidth: 2,
+                            strokeOpacity: 1,
+                            strokeColor: "#666600",
+			    label: "${altitude}",
+			    labelYOffset: 15,
+			    externalGraphic: "http://app.macnoise.com/planeicon/airplane_blue${heading}.png"
+                        },
+                        "Line": {
+                            strokeWidth: 1,
+                            strokeOpacity: 0.5,
+                            strokeColor: "#333333"
+                        }
+                    }
+                }),
+                new OpenLayers.Rule({
+                    filter: new OpenLayers.Filter.Comparison({
+                        type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                        property: "adflag",
+                        value: "A"
+                    }),
+                    symbolizer: {
+                        "Point": {
+                            externalGraphic: "http://app.macnoise.com/planeicon/airplane_red${heading}.png"
+                        }
+                    }
+                }),
+                new OpenLayers.Rule({
+                    filter: new OpenLayers.Filter.Comparison({
+                        type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                        property: "adflag",
+                        value: "D"
+                    }),
+                    symbolizer: {
+                        "Point": {
+                            externalGraphic: "http://app.macnoise.com/planeicon/airplane_green${heading}.png"
+                        }
+                    }
+                })
+            ]
+        });
+
+        this.animatedFlightTracks = new OpenLayers.Layer.Vector("Replay Flight Tracks" , {
+            styleMap: new OpenLayers.StyleMap({"default":this.animatedFlightTrackStyle}),
+            displayInLayerSwitcher: false
+        });
+
+
         this.zoomPanel = Ext.create('Ext.panel.Panel', {
             frame: true,
             bodyStyle: 'padding-top:3px;padding-left:8px;',
@@ -209,7 +268,7 @@
             }
         );
 
-        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.noiseEventLayer, this.measureLayer]);
+        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.animatedFlightTracks, this.noiseEventLayer, this.measureLayer]);
 
         this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
             multiple: false, 

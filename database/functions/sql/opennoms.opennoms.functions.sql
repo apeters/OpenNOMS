@@ -599,3 +599,122 @@ $BODY$
   COST 100
   ROWS 1000;
 ALTER FUNCTION opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text) OWNER TO postgres;
+
+
+-- Function: opennoms.everynseconds(geometry, integer)
+
+-- DROP FUNCTION opennoms.everynseconds(geometry, integer);
+
+CREATE OR REPLACE FUNCTION opennoms.everynseconds(geometry, integer)
+  RETURNS geometry AS
+'select st_makeline(st_locate_along_measure($1,g)) from generate_series(0,floor(st_m(st_endpoint($1)))::int,$2) g;'
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION opennoms.everynseconds(geometry, integer) OWNER TO postgres;
+
+
+
+-- Function: opennoms.mac_dumppoints_web(geometry, timestamp with time zone, integer)
+
+-- DROP FUNCTION opennoms.mac_dumppoints_web(geometry, timestamp with time zone, integer);
+
+CREATE OR REPLACE FUNCTION opennoms.mac_dumppoints_web(IN geometry, IN timestamp with time zone, IN step integer, OUT path integer, OUT x integer, OUT y integer, OUT z integer, OUT "time" timestamp with time zone, OUT heading integer, OUT speed integer)
+  RETURNS SETOF record AS
+$BODY$
+	select * from (select 
+		path[1],
+		round(st_x(geom))::int,
+		round(st_y(geom))::int,
+		round(st_z(geom)*3.2808399)::int as z,
+		(st_m(geom)::text || ' seconds')::interval + $2 as "time",
+		round(mac_heading(lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over ())/10.0)::int * 10 as heading,
+		round(mac_speed(lag(geom,3) over (),lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over (),lead(geom,3) over ())*2.236936)::int as speed
+	from st_dumppoints(everynseconds($1,$3)) 
+	--where 
+	--extract(epoch from ((st_m(geom))::text || ' seconds')::interval + $2)::int % $3 = 0 
+	) as foo where z>59 and speed >50
+ $BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION opennoms.mac_dumppoints_web(geometry, timestamp with time zone, integer) OWNER TO postgres;
+
+
+-- Function: opennoms.mac_heading(geometry, geometry, geometry, geometry, geometry)
+
+-- DROP FUNCTION opennoms.mac_heading(geometry, geometry, geometry, geometry, geometry);
+
+CREATE OR REPLACE FUNCTION opennoms.mac_heading(IN geometry, IN geometry, IN geometry DEFAULT NULL::geometry, IN geometry DEFAULT NULL::geometry, IN geometry DEFAULT NULL::geometry, OUT double precision)
+  RETURNS double precision AS
+$BODY$
+SELECT case 
+	when degrees(atan2(sum(sin(x)),sum(cos(x)))) > 0 then degrees(atan2(sum(sin(x)),sum(cos(x))))
+	else degrees(atan2(sum(sin(x)),sum(cos(x)))) + 360
+	end
+FROM (
+	SELECT st_azimuth($1,$2) as x
+	UNION ALL
+	SELECT st_azimuth($2,$3) as x
+	UNION ALL
+	SELECT st_azimuth($3,$4) as x
+	UNION ALL
+	SELECT st_azimuth($4,$5) as x
+) as foo;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION opennoms.mac_heading(geometry, geometry, geometry, geometry, geometry) OWNER TO postgres;
+
+
+-- Function: opennoms.mac_speed(geometry, geometry, geometry, geometry, geometry, geometry, geometry)
+
+-- DROP FUNCTION opennoms.mac_speed(geometry, geometry, geometry, geometry, geometry, geometry, geometry);
+
+CREATE OR REPLACE FUNCTION opennoms.mac_speed(IN geometry, IN geometry, IN geometry DEFAULT NULL::geometry, IN geometry DEFAULT NULL::geometry, IN geometry DEFAULT NULL::geometry, IN geometry DEFAULT NULL::geometry, IN geometry DEFAULT NULL::geometry, OUT double precision)
+  RETURNS double precision AS
+$BODY$
+SELECT avg(x)
+FROM (
+	SELECT st_distance($1,$2)/(st_m($2)-st_m($1)) as x
+	UNION ALL
+	SELECT st_distance($2,$3)/(st_m($3)-st_m($2)) as x
+	UNION ALL
+	SELECT st_distance($3,$4)/(st_m($4)-st_m($3)) as x
+	UNION ALL
+	SELECT st_distance($4,$5)/(st_m($5)-st_m($4)) as x
+	UNION ALL
+	SELECT st_distance($5,$6)/(st_m($6)-st_m($5)) as x
+	UNION ALL
+	SELECT st_distance($6,$7)/(st_m($7)-st_m($6)) as x
+) as foo;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION opennoms.mac_speed(geometry, geometry, geometry, geometry, geometry, geometry, geometry) OWNER TO postgres;
+
+
+
+-- Function: opennoms.mac_dumppoints_web(geometry, timestamp with time zone, integer)
+
+DROP FUNCTION opennoms.mac_dumppoints_web2(geometry, timestamp with time zone, integer);
+
+CREATE OR REPLACE FUNCTION opennoms.mac_dumppoints_web2(IN geometry, IN timestamp with time zone, IN step integer)
+  RETURNS SETOF text AS
+$BODY$
+	select '{p:' || path || ',x:' || x || ',y:' || y || ',z:' || z || ',t:''' || "time" || ''',h:' || heading || ',s:' || speed || '}' from (select 
+		path[1] as path,
+		round(st_x(geom))::int as x,
+		round(st_y(geom))::int as y,
+		round(st_z(geom)*3.2808399)::int as z,
+		(st_m(geom)::text || ' seconds')::interval + $2 as "time",
+		round(opennoms.mac_heading(lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over ())/10.0)::int * 10 as heading,
+		round(opennoms.mac_speed(lag(geom,3) over (),lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over (),lead(geom,3) over ())*2.236936)::int as speed
+	from st_dumppoints(opennoms.everynseconds($1,$3)) 
+	--where 
+	--extract(epoch from ((st_m(geom))::text || ' seconds')::interval + $2)::int % $3 = 0 
+	) as foo where z>59 and speed >50
+ $BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION opennoms.mac_dumppoints_web2(geometry, timestamp with time zone, integer) OWNER TO postgres;

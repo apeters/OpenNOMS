@@ -216,40 +216,22 @@
                         },
                         scope: this
                     }, {
-                        text: 'Real Time Flight Track Replay',
-                        iconCls: 'clockgo',
-                        handler: function () {
-                            this.fireEvent('changestate', 'realtime');
-                        },
-                        scope: this
-                    }, {
                         text: 'Animated Flight Track Replay',
                         iconCls: 'coggo',
                         handler: function () {
                             this.fireEvent('changestate', 'animated');
                         },
                         scope: this
+                    }, {
+                        text: 'Real Time Flight Track Replay',
+                        iconCls: 'clockgo',
+                        handler: function () {
+                            this.fireEvent('changestate', 'realtime');
+                        },
+                        scope: this
                     }]
                 }
             },'-',{
-                xtype: 'button',
-                id: 'animationplaybutton',
-                iconCls: 'pause',
-                width: 65,
-                hidden: true,
-                text: 'Pause',
-                scope: this,
-                handler: function () {
-                    btn = Ext.getCmp('animationplaybutton');
-                    if (btn.text == 'Pause') {
-                        btn.setText('Play');
-                        btn.setIconCls('play');
-                    } else {
-                        btn.setText('Pause');
-                        btn.setIconCls('pause');
-                    }
-                }
-            },{
                 xtype: 'datefield',
                 id: 'flighttrackstartdatepicker',
                 fieldLabel: 'Start Date',
@@ -309,6 +291,7 @@
             },{
                 xtype: 'button',
                 id: 'gobutton',
+                tooltip: 'Refresh flight tracks',
                 iconCls: 'icon-center refresh',
                 scope: this,
                 handler: function () {
@@ -328,41 +311,22 @@
                 style: 'margin-left: 15px;margin-right: 15px;',
                 hidden: true
             },{
-                xtype: 'combo',
-                id: 'animationspeedcombo',
-                name: 'animationspeed',
+                xtype:'opennoms-widgets-trackanimator',
+		        id:'tabtrackanimator',
                 hidden: true,
-                value: 10,
-                labelWidth: 90,
-                labelAlign: 'right',
-                width: 150,
-                fieldLabel: 'Animation Speed',
-                store: Ext.create('Ext.data.Store', {
-                    fields: ['multiplier', 'text'],
-                    data: [
-                        { "multiplier": 1, "text": "1 x" },
-                        { "multiplier": 2, "text": "2 x" },
-                        { "multiplier": 4, "text": "4 x" },
-                        { "multiplier": 10, "text": "10 x" },
-                        { "multiplier": 20, "text": "20 x" },
-                        { "multiplier": 30, "text": "30 x" },
-                        { "multiplier": 60, "text": "60 x" }
-                    ]
-                }),
-                queryMode: 'local',
-                displayField: 'text',
-                valueField: 'multiplier'
-            },{
-                xtype: 'slider',
-                id: 'animationslider',
+                style: 'margin-top: 0px; margin-left: 30px;',
                 flex: 1,
-                minValue: 0,
-                hideLabel: false,
-                useTips: false,
-                maxValue: 100,
-                style: 'margin-left: 15px;margin-right: 15px;',
-                hidden: true
-            },{
+                span: 20, // seconds of "tail" to show
+                speed: 10, // play at 150x real time
+		        frameRate: Ext.isIE?1:4,
+                listeners:{
+                    'afterrender': function(){
+                        this.layer = OpenNoms.app.appPanel.mapPanel.animatedFlightTracks;
+                    }
+                },
+		        url: 'http://localhost:8080/geoserver/opennoms/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opennoms:realtimetrack&viewparams=airport:MSP;isorange:2011-08-06%2016\\:00\\:00/2011-08-06%2016\\:15\\:00;optype:;x:480956;y:4970848;step:2;&outputFormat=json'
+            },
+            {
                 xtype: 'container',
                 id: 'realtimemessage',
                 html: '(Flight display is delayed by 15 minutes.)',
@@ -401,6 +365,5 @@
             single: true,
             scope: this
         });
-        Ext.getCmp('animationslider').hide();
     }
 });
