@@ -3,8 +3,7 @@
     alias: 'widgets.opennoms-widgets-appheader',
 
     id: 'app-header',
-    smallHeight: 102,
-    tallHeight: 230,
+    height: 102,
     region: 'north',
     layout: {
         type: 'vbox',
@@ -16,12 +15,9 @@
     initComponent: function () {
         this.addEvents({
             'measureclicked': true,
-            'headerresized': true,
             'changestate': true,
             'setdatetimerange': true
         });
-
-        this.height = this.smallHeight;
 
         var yesterday = new Date();
         yesterday.setDate(new Date().getDate() - 1);
@@ -53,17 +49,26 @@
             items: [{
                 xtype: 'combo',
                 triggerCls: 'x-form-search-trigger',
-                name: 'mapsearch',
+                id: 'find-address-combo',
+                name: 'addresssearch',
                 emptyText: 'Find an Address',
+                listConfig: {
+                    loadingText: 'Searching...',
+
+                    // Custom rendering template for each item
+                    getInnerTpl: function () {
+                        return '<div class="search-item">' +
+                                    '{fulladdwcity}' +
+                                '</div>';
+                    }
+                },
                 width: 425,
                 style: 'padding-left: 76px; padding-top: 8px;',
-                loadingText: 'Searching...',
-                zoom: 5,
                 minChars: 5,
-                tpl: '<tpl for="."><div class="x-combo-list-item"><h3>{fulladdwcity}<br></h3></div></tpl>',
+                //tpl: '<tpl for="."><div class="x-combo-list-item"><h3>{fulladdwcity}<br></h3></div></tpl>',
                 hideTrigger: false,
-                displayField: 'fulladdwcity',
                 forceSelection: true,
+                displayField: 'fulladdwcity',
                 queryParam: 'query',
                 store: Ext.create('Ext.data.Store', {
                     fields: ['fulladdress', 'fulladdwcity', 'city', 'zip', 'lon', 'lat', 'x', 'y'],
@@ -88,59 +93,6 @@
                 width: 220,
                 style: 'padding-top: 2px;',
                 items: [{
-//                    xtype: 'button',
-//                    iconCls: 'icon-center plane',
-//                    tooltip: 'Select Flights',
-//                    iconAlign: 'top',
-//                    text: '',
-//                    enableToggle: true,
-//                    toggleGroup: 'expanded-header-controls',
-//                    toggleHandler: function (btn, state) {
-//                        if (state) {
-//                            if (this.getHeight != this.tallHeight) {
-//                                this.setHeight(this.tallHeight);
-//                                this.fireEvent('headerresized');
-//                            } 
-//                            Ext.getCmp('expanded-header-area').layout.setActiveItem(0);
-//                        } else {
-//                            if (this.getHeight != this.smallHeight) {
-//                                this.setHeight(this.smallHeight);
-//                                this.fireEvent('headerresized');
-//                            }
-//                        }
-//                    },
-//                    scope: this,
-//                    scale: 'medium'
-//                }, {
-//                    xtype: 'container',
-//                    width: 10
-//                }, {
-//                    xtype: 'button',
-//                    iconCls: 'icon-center clock',
-//                    iconAlign: 'top',
-//                    text: '',
-//                    enableToggle: true,
-//                    toggleGroup: 'expanded-header-controls',
-//                    toggleHandler: function (btn, state) {
-//                        if (state) {
-//                            if (this.getHeight != this.tallHeight) {
-//                                this.setHeight(this.tallHeight);
-//                                this.fireEvent('headerresized');
-//                            } 
-//                            Ext.getCmp('expanded-header-area').layout.setActiveItem(1);
-//                        } else {
-//                            if (this.getHeight != this.smallHeight) {
-//                                this.setHeight(this.smallHeight);
-//                                this.fireEvent('headerresized');
-//                            }
-//                        }
-//                    },
-//                    scope: this,
-//                    scale: 'medium'
-//                }, {
-//                    xtype: 'container',
-//                    width: 10
-//                }, {
                     xtype: 'button',
                     iconCls: 'icon-center printer',
                     tooltip: 'Print',
@@ -380,16 +332,6 @@
                 style: 'padding-left: 5px;',
                 hidden: true
             }]
-//        },{
-//            xtype: 'panel', 
-//            id: 'expanded-header-area',
-//            border: false,
-//            height: 128,
-//            layout: 'card',
-//            items: [Ext.create('OpenNoms.widgets.SelectFlights'),{ 
-//                xtype: 'panel',
-//                title: 'Time...'
-//            }]
         }];
 
         this.callParent(arguments);
@@ -412,6 +354,5 @@
             single: true,
             scope: this
         });
-        Ext.getCmp('animationslider').hide();
     }
 });

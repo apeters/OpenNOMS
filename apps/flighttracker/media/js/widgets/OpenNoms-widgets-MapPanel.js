@@ -209,7 +209,29 @@
             }
         );
 
-        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.noiseEventLayer, this.measureLayer]);
+        var addressSearchStyle = new OpenLayers.StyleMap({
+            "default": new OpenLayers.Style({
+                externalGraphic: 'Media/images/SearchResult.png',
+                graphicWidth: 32,
+                graphicHeight: 37,
+                graphicOpacity: 1,
+                graphicXOffset: -16,
+                graphicYOffset: -37,
+                backgroundGraphic: 'Media/images/shadow.png',
+                backgroundXOffset: -16,
+                backgroundYOffset: -37,
+                backgroundHeight: 37,
+                backgroundWidth: 51
+            })
+        });
+
+        this.addressSearchLayer = new OpenLayers.Layer.Vector(
+            "AddressSearchLayer", {
+                styleMap: addressSearchStyle
+            }
+        );
+
+        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
 
         this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
             multiple: false, 

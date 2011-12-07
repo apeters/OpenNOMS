@@ -49,9 +49,6 @@ OpenNoms.app = {
                     }
                 }
             },
-            'headerresized': function () {
-                this.appPanel.mapPanel.map.baseLayer.redraw();
-            },
             scope: this
         });
 
@@ -142,7 +139,7 @@ OpenNoms.app = {
         Ext.getCmp('noise-event-viewer').store.on({
             'load': function (store, records, success, operation, opts) {
                 this.appPanel.noiseButton.query('button')[0].toggle(true);
-                var features = []
+                var features = [];
                 this.appPanel.mapPanel.noiseEventLayer.removeAllFeatures();
                 Ext.each(records, function (record, index, allRecords) {
                     var feature = this.appPanel.mapPanel.wktFormat.read(record.get('wkt'));
@@ -180,6 +177,18 @@ OpenNoms.app = {
             'load': function (store, record, operation, opts) {
                 this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
                 this.appPanel.mapPanel.staticflightlayer.setVisibility(true);
+            },
+            scope: this
+        });
+
+        Ext.getCmp('find-address-combo').on({
+            'select': function (combo, records, opts) {
+                var geom = new OpenLayers.Geometry.Point(records[0].get('x'), records[0].get('y'));
+                var feature = new OpenLayers.Feature.Vector(geom, records[0].data);
+                var loc = new OpenLayers.LonLat(records[0].get('x'), records[0].get('y'));
+                this.appPanel.mapPanel.addressSearchLayer.removeAllFeatures();
+                this.appPanel.mapPanel.addressSearchLayer.addFeatures([feature]);
+                this.appPanel.mapPanel.map.setCenter(loc, 5);
             },
             scope: this
         });
