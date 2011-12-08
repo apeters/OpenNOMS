@@ -252,6 +252,15 @@
                 displayField: 'text',
                 valueField: 'length'
             },{
+                xtype: 'checkboxfield',
+                id: 'truncate-flight-tracks-checkbox',
+                name: 'truncateflighttracks',
+                value: false,
+                labelWidth: 125,
+                labelAlign: 'right',
+                width: 150,
+                fieldLabel: 'Truncate Flight Tracks?'
+            },{
                 xtype: 'button',
                 id: 'gobutton',
                 tooltip: 'Refresh flight tracks',

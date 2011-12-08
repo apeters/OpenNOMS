@@ -19,6 +19,7 @@
             Ext.getCmp('flighttrackstartdatepicker').hide();
             Ext.getCmp('flighttrackstarttimepicker').hide();
             Ext.getCmp('staticlengthcombo').hide();
+            Ext.getCmp('truncate-flight-tracks-checkbox').hide();
             Ext.getCmp('realtimemessage').hide();
             Ext.getCmp('tabtrackanimator').hide();
             //Ext.getCmp('animationspeedcombo').hide();
@@ -31,6 +32,7 @@
                     Ext.getCmp('flighttrackstartdatepicker').show();
                     Ext.getCmp('flighttrackstarttimepicker').show();
                     Ext.getCmp('staticlengthcombo').show();
+                    Ext.getCmp('truncate-flight-tracks-checkbox').show();
                     Ext.getCmp('gobutton').show();
                     Ext.getCmp('map-panel').clickControl.activate();
                     Ext.getCmp('map-panel').staticflightlayer.setVisibility(true);
