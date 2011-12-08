@@ -84,19 +84,31 @@ OpenNoms.app = {
             'mapclicked': function (e) {
                 var loc = this.appPanel.mapPanel.map.getLonLatFromPixel(e.xy);
                 Ext.Ajax.request({
-                    url: OpenNoms.config.URLs.ows,
+                    url: OpenNoms.config.URLs.ows + '?viewparams=' + this.queryController.formatParamsForGeoserver() +
+                        'x:' + loc.lon + ';y:' + loc.lat + ';' +
+                        //TODO: wire up rest of params
+                        'airport:MSP;isorange:2011-08-05%2000\\:00\\:00/2011-08-06%2016\\:10\\:00;optype:;',
+                    method: 'GET',
                     params: {
                         'service': 'WFS',
                         'version': '1.0.0',
                         'request': 'GetFeature',
                         'typeName': 'opennoms:getclosesttrack',
                         'maxFeatures': '50',
-                        'outputFormat': 'json',
-                        'viewparams': 'airport:MSP;isorange:2011-08-05%2000\:00\:00/2011-08-06%2016\:10\:00;optype:;x:480956;y:4970848;'
+                        'outputFormat': 'json'
                     },
                     success: function (response) {
-                        //alert('test');
-                    }
+                        var responseObj = Ext.JSON.decode(response.responseText);
+                        if (responseObj.features.length > 0) {
+                            this.appPanel.mapPanel.selectedFlightTrackLayer.removeAllFeatures();
+                            var feature = this.appPanel.mapPanel.wktFormat.read(responseObj.features[0].properties.wkt);
+                            feature.attributes = responseObj.features[0].properties;
+                            this.appPanel.mapPanel.selectedFlightTrackLayer.addFeatures([feature]);
+                            Ext.getCmp('noise-event-viewer').store.proxy.extraParams.viewparams = 'opnum:' + responseObj.features[0].properties.opnum;
+                            Ext.getCmp('noise-event-viewer').store.load();
+                        }
+                    },
+                    scope: this
                 });
             },
             scope: this
@@ -223,9 +235,6 @@ OpenNoms.app = {
     */
     loadData: function () {
         Ext.getCmp('select-flights').store.load();
-        // how to load noise event data... set viewparams, call load!
-        Ext.getCmp('noise-event-viewer').store.proxy.extraParams.viewparams = "opnum:13181255";
-        Ext.getCmp('noise-event-viewer').store.load();
     },
 
     initControllers: function () {
