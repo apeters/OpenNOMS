@@ -35,6 +35,7 @@
                     Ext.getCmp('gobutton').show();
                     Ext.getCmp('map-panel').clickControl.activate();
                     Ext.getCmp('map-panel').staticflightlayer.setVisibility(true);
+                    Ext.getCmp('map-panel').animatedFlightTracks.removeAllFeatures();
                     this.state = 'static';
                     break;
                 case 'realtime':
@@ -44,7 +45,8 @@
                     Ext.getCmp('app-panel').noiseButton.query('button')[0].toggle(false);
                     Ext.getCmp('noise-event-viewer').store.removeAll();
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
-                    //Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
+                    Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
+                    Ext.getCmp('map-panel').animatedFlightTracks.removeAllFeatures();
                     this.state = 'realtime';
                     break;
                 case 'animated':
@@ -57,7 +59,7 @@
                     Ext.getCmp('app-panel').noiseButton.query('button')[0].toggle(false);
                     Ext.getCmp('noise-event-viewer').store.removeAll();
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
-                    //Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
+                    Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
                     this.state = 'animated';
                     break;
             }

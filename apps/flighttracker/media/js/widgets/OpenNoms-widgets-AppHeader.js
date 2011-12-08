@@ -263,6 +263,7 @@
             },{
                 xtype: 'button',
                 id: 'gobutton',
+                text: 'Refresh Tracks',
                 tooltip: 'Refresh flight tracks',
                 iconCls: 'icon-center refresh',
                 scope: this,
