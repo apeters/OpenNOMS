@@ -3,12 +3,16 @@
 *  .. class:: TrackAnimator
 */
 Ext.define('OpenNoms.widgets.TrackAnimator', {
-    extend: 'Ext.container.Container',
+    extend: 'Ext.container.ButtonGroup',
     alias: 'widget.opennoms-widgets-trackanimator',
 
     layout: {
         type: 'hbox'
     },
+    baseCls: 'x-plain',
+    style: 'margin-top: 2px; margin-left: 15px;',
+    height: 22,
+    border: '0 0 0 0',
 
     /** api: config[textReset]
     *  ``String``
