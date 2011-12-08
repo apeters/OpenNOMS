@@ -277,7 +277,6 @@
                 xtype:'opennoms-widgets-trackanimator',
 		        id:'tabtrackanimator',
                 hidden: true,
-                style: 'margin-top: 0px; margin-left: 30px;',
                 flex: 1,
                 span: 20, // seconds of "tail" to show
                 speed: 10, // play at 150x real time

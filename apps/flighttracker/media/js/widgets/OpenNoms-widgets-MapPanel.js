@@ -358,7 +358,8 @@
         this.clickControl.activate();
 
         this.mousePosition = new OpenLayers.Control.MousePosition({
-            element: Ext.get('cursor-position').dom
+            element: Ext.get('cursor-position').dom,
+            displayProjection: this.supportedProjections.geographic
         });
 
         this.map.addControl(this.mousePosition);
