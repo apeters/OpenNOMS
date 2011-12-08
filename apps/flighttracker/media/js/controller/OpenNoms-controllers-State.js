@@ -20,9 +20,8 @@
             Ext.getCmp('staticlengthcombo').hide();
             Ext.getCmp('realtimemessage').hide();
             Ext.getCmp('tabtrackanimator').hide();
-            //Ext.getCmp('animationspeedcombo').hide();
-            //Ext.getCmp('animationslider').hide();
             Ext.getCmp('gobutton').hide();
+            Ext.getCmp('map-panel').staticflightlayer.setVisibility(false);
 
             switch (state) {
                 case 'static':
@@ -37,32 +36,23 @@
                 case 'realtime':
                     Ext.getCmp('flight-track-type-menu').setText('<span style="font-weight:bold;">Real Time Flight Track Replay</span>');
                     Ext.getCmp('realtimemessage').show();
-                    //btn = Ext.getCmp('animationplaybutton');
-                    //btn.setText('Pause');
-                    //btn.setIconCls('pause');
-                    //btn.show();
                     Ext.getCmp('map-panel').clickControl.deactivate();
                     Ext.getCmp('app-panel').noiseButton.query('button')[0].toggle(false);
                     Ext.getCmp('noise-event-viewer').store.removeAll();
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
-                    Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
+                    //Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
                     break;
                 case 'animated':
                     Ext.getCmp('flight-track-type-menu').setText('<span style="font-weight:bold;">Animated Flight Track Replay</span>');
                     Ext.getCmp('flighttrackstartdatepicker').show();
                     Ext.getCmp('flighttrackstarttimepicker').show();
                     Ext.getCmp('tabtrackanimator').show();
-                    //Ext.getCmp('animationslider').show();
                     Ext.getCmp('gobutton').show();
-                    //btn = Ext.getCmp('animationplaybutton');
-                    //btn.setText('Play');
-                    //btn.setIconCls('play');
-                    //btn.show();
                     Ext.getCmp('map-panel').clickControl.deactivate();
                     Ext.getCmp('app-panel').noiseButton.query('button')[0].toggle(false);
                     Ext.getCmp('noise-event-viewer').store.removeAll();
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
-                    Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
+                    //Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
                     break;
             }
         }
