@@ -5,6 +5,7 @@
     id: 'map-panel',
     region: 'center',
     border: true,
+    displaySystem: 'english',
 
     initComponent: function () {
         this.addEvents({
@@ -314,7 +315,7 @@
                 },
                 eventListeners: {
                     "featureadded": function (e) {
-                        this.fireEvent('distancemeasurecomplete', e.feature);
+                        this.fireEvent('distancemeasurecomplete', this.measure(e.feature.geometry));
                     },
                     scope: this
                 }
@@ -328,7 +329,7 @@
                 },
                 eventListeners: {
                     "featureadded": function (e) {
-                        this.fireEvent('areameasurecomplete', e.feature);
+                        this.fireEvent('areameasurecomplete', this.measure(e.feature.geometry));
                     },
                     scope: this
                 }

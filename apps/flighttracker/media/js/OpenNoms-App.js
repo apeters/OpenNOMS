@@ -65,20 +65,20 @@ OpenNoms.app = {
         });
 
         this.appPanel.mapPanel.on({
-            'distancemeasurecomplete': function (feature) {
-                var measure = feature.geometry.getLength().toFixed(3) + ' ' + this.appPanel.mapPanel.map.getUnits();
+            'distancemeasurecomplete': function (measureObj) {
+                var measureText = measureObj.measure.toFixed(3) + " " + measureObj.units;
                 this.appPanel.mapPanel.drawDistanceMeasureControl.deactivate();
                 this.appPanel.measureFeedbackPanel.show();
                 this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [70, 10]);
-                Ext.get('measure-read-out').dom.innerHTML = measure;
+                Ext.get('measure-read-out').dom.innerHTML = measureText;
                 Ext.getCmp('measure-button').toggle(false);
             },
-            'areameasurecomplete': function (feature) {
-                var measure = feature.geometry.getArea().toFixed(3) + ' sq ' + this.appPanel.mapPanel.map.getUnits();
+            'areameasurecomplete': function (measureObj) {
+                var measureText = measureObj.measure.toFixed(3) + " " + measureObj.units + "<sup>2</" + "sup>";
                 this.appPanel.mapPanel.drawAreaMeasureControl.deactivate();
                 this.appPanel.measureFeedbackPanel.show();
                 this.appPanel.measureFeedbackPanel.alignTo(this.appPanel.mapPanel, 'tl-tl', [70, 10]);
-                Ext.get('measure-read-out').dom.innerHTML = measure;
+                Ext.get('measure-read-out').dom.innerHTML = measureText;
                 Ext.getCmp('measure-button').toggle(false);
             },
             'mapclicked': function (e) {
