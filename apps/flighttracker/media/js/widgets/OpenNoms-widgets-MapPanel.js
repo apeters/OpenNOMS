@@ -16,24 +16,25 @@
 
         this.wktFormat = new OpenLayers.Format.WKT();
 
+        this.supportedProjections = {
+            geographic: new OpenLayers.Projection("EPSG:4326"),
+            mercator: new OpenLayers.Projection("EPSG:900913"),
+            utm: new OpenLayers.Projection("EPSG:26915"),
+        };
+
         this.map = new OpenLayers.Map('map', {
             controls: [
 	            new OpenLayers.Control.Navigation({ zoomWheelEnabled: false })
 	        ],
             center: new OpenLayers.LonLat(482188, 4969538),
             maxExtent: new OpenLayers.Bounds(411482, 4900449, 552143, 5041149),
-            projection: new OpenLayers.Projection("EPSG:26915"),
-            displayProjection: new OpenLayers.Projection("EPSG:4326"),
+            projection: this.supportedProjections.utm,
+            displayProjection: this.supportedProjections.geographic,
             resolutions: [256, 128, 64, 32, 16, 8, 4, 2, 1],
             tileSize: new OpenLayers.Size(512, 512),
-            allOverlays: true
+            allOverlays: true,
+            units: 'm'
         });
-
-        this.supportedProjections = {
-            geographic: new OpenLayers.Projection("EPSG:4326"),
-            mercator: new OpenLayers.Projection("EPSG:900913"),
-            utm: new OpenLayers.Projection("EPSG:26915"),
-        };
 
         this.bbar = Ext.create('Ext.toolbar.Toolbar', {
             items: [
