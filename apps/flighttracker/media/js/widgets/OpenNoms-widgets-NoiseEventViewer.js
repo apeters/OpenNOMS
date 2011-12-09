@@ -3,7 +3,6 @@
     alias: 'widgets.opennoms-widgets-noiseeventviewer',
 
     id: 'noise-event-viewer',
-    title: 'Noise Event Information',
 
     initComponent: function () {
         var url = OpenNoms.config.URLs.ows;
@@ -35,12 +34,12 @@
         });
 
         this.columns = [
-            { header: 'RMT', dataIndex: 'rmt', width: 38 },
-            { header: 'LMax', dataIndex: 'lmax', width: 38 },
-            { header: 'LEQ', dataIndex: 'leq', width: 38 },
-            { header: 'SEL', dataIndex: 'sel', width: 38 },
+            { header: 'RMT', dataIndex: 'rmt', width: 34 },
+            { header: 'LMax (db)', dataIndex: 'lmax', width: 56 },
+            { header: 'LEQ (db)', dataIndex: 'leq', width: 50 },
+            { header: 'SEL (db)', dataIndex: 'sel', width: 50 },
             { header: 'Max Time', dataIndex: 'mtime', xtype: 'datecolumn', format: 'F j, Y, g:i:s a', flex: 1 },
-            { header: 'Duration', dataIndex: 'duration', width: 60 }
+            { header: 'Duration (s)', dataIndex: 'duration', width: 66 }
         ];
 
         this.callParent(arguments);

@@ -55,8 +55,14 @@
 .pause {
 	background-image:url(../images/silk/icons/control_pause.png) !important;
 }
+.link {
+	background-image:url(../images/silk/icons/link.png) !important;
+}
 .plane {
 	background-image:url(../images/plane.png) !important;
+}
+.microphone {
+	background-image:url(../images/microphone.png) !important;
 }
 .icon-center {
     background-position: 50% 50%;

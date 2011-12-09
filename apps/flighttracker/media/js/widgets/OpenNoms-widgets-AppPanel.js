@@ -7,7 +7,8 @@
 
     initComponent: function () {
         this.addEvents({
-            'clearmeasureclicked': true
+            'clearmeasureclicked': true,
+            'refreshnoiseclicked': true
         });
 
         this.mapPanel = new OpenNoms.widgets.MapPanel();
@@ -29,7 +30,7 @@
             layout: 'fit',
             items: [{
                 xtype: 'button',
-                iconCls: 'icon-center sound',
+                iconCls: 'icon-center microphone',
                 tooltip: 'View Noise Events',
                 iconAlign: 'top',
                 text: '',
@@ -108,18 +109,45 @@
         this.infoPanel = Ext.create('Ext.panel.Panel', {
             frame: true,
             floating: true,
-            width: 375,
+            width: 425,
             height: 320,
             layout: 'card',
-            items: [Ext.create('OpenNoms.widgets.NoiseEventViewer', {
+            items: [{
+                xtype: 'panel',
+                title: 'Noise Event Information',
+                layout: 'border',
                 tools: [{
+                    type: 'refresh',
+                    handler: function () {
+                        this.fireEvent('refreshnoiseclicked');
+                    },
+                    scope: this
+                }, {
                     type: 'close',
                     handler: function (event, toolEl, panel) {
                         this.noiseButton.query('button')[0].toggle();
                     },
                     scope: this
-                }]
-            }), Ext.create('OpenNoms.widgets.Legend', {
+                }],
+                items: [{
+                    xtype: 'container',
+                    id: 'flight-info-region',
+                    height: 25,
+                    style: 'padding:5px;',
+                    tpl: new Ext.XTemplate(
+                        '<tpl if="opnum == \'no flight\'">',
+                            '<p>No Flight Track Selected</p>',
+                        '</tpl>',
+                        '<tpl if="opnum != \'no flight\'">',
+                            '<p><span style="font-weight:bold;">Flight #:</span> {flight_id}, <span style="font-weight:bold;">Airport</span> {airport}, <span style="font-weight:bold;">Airline:</span> {airline}, <span style="font-weight:bold;">Aircraft:</span> {actype}</p>',
+                        '</tpl>'
+                    ),
+                    data: { opnum: 'no flight' },
+                    region: 'north'
+                }, Ext.create('OpenNoms.widgets.NoiseEventViewer', {
+                    region: 'center'
+                })]
+            }, Ext.create('OpenNoms.widgets.Legend', {
                 tools: [{
                     type: 'close',
                     handler: function (event, toolEl, panel) {

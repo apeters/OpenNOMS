@@ -23,6 +23,7 @@
             Ext.getCmp('realtimemessage').hide();
             Ext.getCmp('tabtrackanimator').hide();
             Ext.getCmp('gobutton').hide();
+            Ext.getCmp('display-type-combo').hide();
             Ext.getCmp('map-panel').staticflightlayer.setVisibility(false);
 
             switch (state) {
@@ -41,6 +42,7 @@
                 case 'realtime':
                     Ext.getCmp('flight-track-type-menu').setText('<span style="font-weight:bold;">Real Time Flight Track Replay</span>');
                     Ext.getCmp('realtimemessage').show();
+                    Ext.getCmp('display-type-combo').show();
                     Ext.getCmp('map-panel').clickControl.deactivate();
                     Ext.getCmp('app-panel').noiseButton.query('button')[0].toggle(false);
                     Ext.getCmp('noise-event-viewer').store.removeAll();
@@ -55,6 +57,7 @@
                     Ext.getCmp('flighttrackstarttimepicker').show();
                     Ext.getCmp('tabtrackanimator').show();
                     Ext.getCmp('gobutton').show();
+                    Ext.getCmp('display-type-combo').show();
                     Ext.getCmp('map-panel').clickControl.deactivate();
                     Ext.getCmp('app-panel').noiseButton.query('button')[0].toggle(false);
                     Ext.getCmp('noise-event-viewer').store.removeAll();

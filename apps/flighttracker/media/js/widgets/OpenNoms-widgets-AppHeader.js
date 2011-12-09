@@ -99,6 +99,7 @@
                     iconAlign: 'top',
                     text: '',
                     handler: function () {
+                        Ext.Msg.alert('Under Construction', 'This feature is coming soon!');
                     },
                     scope: this,
                     scale: 'medium'
@@ -107,11 +108,12 @@
                     width: 10
                 }, {
                     xtype: 'button',
-                    iconCls: 'icon-center email',
-                    tooltip: 'Email',
+                    iconCls: 'icon-center link',
+                    tooltip: 'Email Link',
                     iconAlign: 'top',
                     text: '',
                     handler: function () {
+                        Ext.Msg.alert('Under Construction', 'This feature is coming soon!');
                     },
                     scope: this,
                     scale: 'medium'
@@ -221,6 +223,7 @@
                 id: 'staticlengthcombo',
                 name: 'staticlength',
                 value: 600000,
+                forceSelection:true,
                 labelWidth: 45,
                 labelAlign: 'right',
                 width: 150,
@@ -256,10 +259,41 @@
                 id: 'truncate-flight-tracks-checkbox',
                 name: 'truncateflighttracks',
                 value: false,
-                labelWidth: 125,
+                labelWidth: 160,
                 labelAlign: 'right',
-                width: 150,
-                fieldLabel: 'Truncate Flight Tracks?'
+                width: 185,
+                fieldLabel: 'Truncate Flight Tracks by Time?'
+            },{
+                xtype: 'container',
+                id: 'realtimemessage',
+                html: '(Flight display is delayed by 15 minutes.)',
+                style: 'padding-left: 5px;',
+                hidden: true
+            },{
+                xtype: 'combo',
+                id: 'display-type-combo',
+                name: 'displaytype',
+                value: 'altitude',
+                forceSelection:true,
+                labelWidth: 45,
+                labelAlign: 'right',
+                width: 200,
+                fieldLabel: 'Display',
+                store: Ext.create('Ext.data.Store', {
+                    fields: ['value', 'text'],
+                    data: [
+	                    { "value": 'flight_id', "text": 'Flight ID' },
+	                    { "value": 'airline', "text": 'Airline' },
+	                    { "value": 'altitude', "text": 'Altitude (Feet above MSP Field)' },
+	                    { "value": 'heading', "text": 'Heading (Degrees)' },
+	                    { "value": 'actype', "text": 'Aircraft Type' },
+	                    { "value": 'speed', "text": 'Speed (MPH)' }
+                    ]
+                }),
+                queryMode: 'local',
+                displayField: 'text',
+                valueField: 'value',
+                hidden: true
             },{
                 xtype: 'button',
                 id: 'gobutton',
@@ -297,13 +331,6 @@
                     }
                 },
 		        url: 'http://localhost:8080/geoserver/opennoms/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opennoms:realtimetrack&viewparams=airport:MSP;isorange:2011-08-06%2016\\:00\\:00/2011-08-06%2016\\:15\\:00;optype:;x:480956;y:4970848;step:2;&outputFormat=json'
-            },
-            {
-                xtype: 'container',
-                id: 'realtimemessage',
-                html: '(Flight display is delayed by 15 minutes.)',
-                style: 'padding-left: 5px;',
-                hidden: true
             }]
         }];
 

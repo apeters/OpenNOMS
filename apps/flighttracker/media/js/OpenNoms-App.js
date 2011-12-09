@@ -88,9 +88,9 @@ OpenNoms.app = {
                     method: 'GET',
                     params: {
                         'viewparams': this.queryController.formatParamsForGeoserver() +
-                            'x:' + loc.lon + 
+                            'x:' + loc.lon +
                             ';y:' + loc.lat + ';' +
-                            //TODO: wire up rest of params
+                        //TODO: wire up rest of params
                             'airport:MSP\\,STP\\,FCM\\,NONE;optype:;',
                         'service': 'WFS',
                         'version': '1.0.0',
@@ -106,6 +106,7 @@ OpenNoms.app = {
                             var feature = this.appPanel.mapPanel.wktFormat.read(responseObj.features[0].properties.wkt);
                             feature.attributes = responseObj.features[0].properties;
                             this.appPanel.mapPanel.selectedFlightTrackLayer.addFeatures([feature]);
+                            Ext.getCmp('flight-info-region').update(responseObj.features[0].properties);
                             Ext.getCmp('noise-event-viewer').store.proxy.extraParams.viewparams = 'opnum:' + responseObj.features[0].properties.opnum;
                             Ext.getCmp('noise-event-viewer').store.load();
                         }
@@ -164,6 +165,12 @@ OpenNoms.app = {
             'clearmeasureclicked': function (feature) {
                 this.appPanel.measureFeedbackPanel.hide();
                 this.appPanel.mapPanel.measureLayer.removeAllFeatures();
+            },
+            'refreshnoiseclicked': function () {
+                this.appPanel.mapPanel.noiseEventLayer.removeAllFeatures();
+                this.appPanel.mapPanel.selectedFlightTrackLayer.removeAllFeatures();
+                Ext.getCmp('noise-event-viewer').store.removeAll();
+                Ext.getCmp('flight-info-region').update({ opnum: 'no flight' });
             },
             'afterlayout': function () {
                 this.appPanel.mapPanel.map.updateSize();
@@ -225,6 +232,17 @@ OpenNoms.app = {
                 this.appPanel.mapPanel.addressSearchLayer.removeAllFeatures();
                 this.appPanel.mapPanel.addressSearchLayer.addFeatures([feature]);
                 this.appPanel.mapPanel.map.setCenter(loc, 5);
+            },
+            scope: this
+        });
+
+        Ext.getCmp('display-type-combo').on({
+            'select': function (combo, records, opts) {
+                var value = records[0].get('value');
+                Ext.each(this.appPanel.mapPanel.animatedFlightTracks.styleMap.styles["default"].rules, function (rule, index, allRules) {
+                    rule.symbolizer.Point.label = '${' + value + '}';
+                }, this);
+                this.appPanel.mapPanel.animatedFlightTracks.redraw();
             },
             scope: this
         });
