@@ -17,6 +17,7 @@
     updateLayerWithNewParams: function (layer) {
         // here we'd get the time values for example and update the static flight track
         // for now lets just do this until we understand the time picker better
+        //layer.setUrl(OpenNoms.config.URLs.wms + '?viewparams=' + this.formatParamsForGeoserver());
         layer.mergeNewParams({ viewparams: this.formatParamsForGeoserver() });
     },
 
@@ -68,8 +69,18 @@
         return params;
     },
 
+    getIsoRange: function () {
+        var startDate = Ext.getCmp('flighttrackstartdatepicker').getValue();
+        var startTime = Ext.getCmp('flighttrackstarttimepicker').getValue();
+        startDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds());
+        endDate = new Date();
+        endDate.setTime(startDate.getTime() + Ext.getCmp('staticlengthcombo').getValue());
+        return Ext.Date.format(startDate, 'Y-m-d H\\\\:i\\\\:s') + '/' + Ext.Date.format(endDate, 'Y-m-d H\\\\:i\\\\:s');
+    },
+
     formatParamsForGeoserver: function () {
         var params = this.getFlightParams();
+        params.isorange = this.getIsoRange();
         var ret = "";
         for (var propertyName in params) {
             ret += propertyName + ':' + params[propertyName] + ';';
@@ -77,6 +88,4 @@
 
         return ret;
     }
-
-
 });

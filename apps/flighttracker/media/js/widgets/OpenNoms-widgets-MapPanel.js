@@ -95,7 +95,7 @@
 
  
         //static flight track layer
-        this.staticflightlayer = new OpenLayers.Layer.WMS("Static Flight Tracks", "http://localhost:8080/geoserver/opennoms/wms", { 
+        this.staticflightlayer = new OpenLayers.Layer.WMS("Static Flight Tracks", OpenNoms.config.URLs.wms, { 
             layers: 'opennoms:macnoise', 
             transparent: "true", 
             isodate: '2000-1-1' 

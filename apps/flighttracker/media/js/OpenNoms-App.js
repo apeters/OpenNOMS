@@ -84,12 +84,14 @@ OpenNoms.app = {
             'mapclicked': function (e) {
                 var loc = this.appPanel.mapPanel.map.getLonLatFromPixel(e.xy);
                 Ext.Ajax.request({
-                    url: OpenNoms.config.URLs.ows + '?viewparams=' + this.queryController.formatParamsForGeoserver() +
-                        'x:' + loc.lon + ';y:' + loc.lat + ';' +
-                        //TODO: wire up rest of params
-                        'airport:MSP;isorange:2011-08-05%2000\\:00\\:00/2011-08-06%2016\\:10\\:00;optype:;',
+                    url: OpenNoms.config.URLs.ows,
                     method: 'GET',
                     params: {
+                        'viewparams': this.queryController.formatParamsForGeoserver() +
+                            'x:' + loc.lon + 
+                            ';y:' + loc.lat + ';' +
+                            //TODO: wire up rest of params
+                            'airport:MSP\\,STP\\,FCM\\,NONE;optype:;',
                         'service': 'WFS',
                         'version': '1.0.0',
                         'request': 'GetFeature',
