@@ -362,23 +362,12 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
             }
             this.layer.addFeatures(tracks.concat(heads));
         }
-
-        this.updateDateDisplay(new Date(maxTime));
-
     },
 
-    /** api: config[updateDateDisplay]
-    *  ``Function``
-    *  To customize the display of the current date, provide a method that
-    *  accepts a Date instance and returns text or html.
-    */
-    updateDateDisplay: function (date) {
-        //alert(date);
-        if (date && date != "Invalid Date" && date !== 0 && !isNaN(date)) {
-            // this.dateDisplay.update(date.format("Y-m-d h:i:s A"));
-        } else {
-            //  this.dateDisplay.update("No Data Available for Selected Time");
-        }
+
+    hide: function (date) {
+        this.slider.plugins[0].hide();
+        this.callParent(arguments);
     },
 
     /** api: method[play]

@@ -298,7 +298,7 @@
             }
         );
 
-        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.selectedFlightTrackLayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
+        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.animatedFlightTracks, this.selectedFlightTrackLayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
 
         this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
             multiple: false, 
