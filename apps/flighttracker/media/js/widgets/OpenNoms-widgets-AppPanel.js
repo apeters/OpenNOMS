@@ -147,15 +147,45 @@
                 }, Ext.create('OpenNoms.widgets.NoiseEventViewer', {
                     region: 'center'
                 })]
-            }, Ext.create('OpenNoms.widgets.Legend', {
+            }, {
+                xtype: 'panel',
+                title: 'Legend',
+                layout: 'border',
                 tools: [{
                     type: 'close',
                     handler: function (event, toolEl, panel) {
                         this.legendButton.query('button')[0].toggle();
                     },
                     scope: this
-                }]
-            }), Ext.create('OpenNoms.widgets.SelectFlights', {
+                }],
+                items: [{
+                    xtype: 'container',
+                    id: 'flight-legend-display-region',
+                    height: 60,
+                    style: 'padding:5px;',
+                    layout: 'card',
+                    items: [{
+                        xtype: 'container',
+                        html: '<div style="font-weight:bold;">Flight Track Display:</div>' +
+                            '​<div id="staticflightlegend">' +
+                                '<img src="Media/images/redline.png" style="padding-left:30px;padding-right:6px;">Arrival' +
+                                '<img src="Media/images/greenline.png" style="padding-left:30px;padding-right:6px;">Departure' +
+                                '<img src="Media/images/blueline.png" style="padding-left:30px;padding-right:6px;">Untagged' +
+                            '</div>'
+                    }, {
+                        xtype: 'container',
+                        html: '<div style="font-weight:bold;">Animated Flight Display:</div>' +
+                            '​<div id="animatedflightlegend">' +
+                                '<img src="Media/images/airplane_red.png" style="padding-left:30px;padding-right:6px;">Arrival' +
+                                '<img src="Media/images/airplane_green.png" style="padding-left:30px;padding-right:6px;">Departure' +
+                                '<img src="Media/images/airplane_blue.png" style="padding-left:30px;padding-right:6px;">Untagged' +
+                            '</div>'
+                    }],
+                    region: 'north'
+                }, Ext.create('OpenNoms.widgets.Legend', {
+                    region: 'center'
+                })]
+            }, Ext.create('OpenNoms.widgets.SelectFlights', {
                 tools: [{
                     type: 'close',
                     handler: function (event, toolEl, panel) {

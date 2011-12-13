@@ -37,6 +37,7 @@
                     Ext.getCmp('map-panel').clickControl.activate();
                     Ext.getCmp('map-panel').staticflightlayer.setVisibility(true);
                     Ext.getCmp('map-panel').animatedFlightTracks.removeAllFeatures();
+                    Ext.getCmp('flight-legend-display-region').layout.setActiveItem(0);
                     this.state = 'static';
                     break;
                 case 'realtime':
@@ -49,6 +50,7 @@
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
                     Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
                     Ext.getCmp('map-panel').animatedFlightTracks.removeAllFeatures();
+                    Ext.getCmp('flight-legend-display-region').layout.setActiveItem(1);
                     this.state = 'realtime';
                     break;
                 case 'animated':
@@ -63,6 +65,7 @@
                     Ext.getCmp('noise-event-viewer').store.removeAll();
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
                     Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
+                    Ext.getCmp('flight-legend-display-region').layout.setActiveItem(1);
                     this.state = 'animated';
                     break;
             }

@@ -53,7 +53,7 @@
         this.callParent(arguments);
 
         //tiled version of MAC base layers from MapProxy
-        this.tmsbase = new OpenLayers.Layer.TMS('Base Map', 'http://app.macnoise.com/mapproxy/tms/', { 
+        this.tmsbase = new OpenLayers.Layer.TMS('Base Map', OpenNoms.config.URLs.tms, { 
             layername: 'base_EPSG26915', 
             type: 'png', 
             tileSize: new OpenLayers.Size(512, 512), 
@@ -66,7 +66,7 @@
         //tiled version of contours from MapProxy
         this.tmscontours = new OpenLayers.Layer.TMS(
 	        "2007 Forecast Year Mitigated DNL Contours",
-	        "http://app.macnoise.com/mapproxy/tms/",
+	        OpenNoms.config.URLs.tms,
 	        {
                 layername:'contours_EPSG26915',
                 type:'png',
@@ -81,7 +81,7 @@
         //tiled version of RMTS from MapProxy
         this.tmsrmts = new OpenLayers.Layer.TMS(
 	        "Remote Monitoring Towers",
-	        "http://app.macnoise.com/mapproxy/tms/",
+	        OpenNoms.config.URLs.tms,
 	        {
                 layername:'rmts_EPSG26915',
                 type:'png',
@@ -127,7 +127,7 @@
                             strokeColor: "#666600",
 			    label: "${altitude}",
 			    labelYOffset: 15,
-			    externalGraphic: "http://app.macnoise.com/planeicon/airplane_blue${heading}.png"
+			    externalGraphic: OpenNoms.config.URLs.planeIcons + "airplane_blue${heading}.png"
                         },
                         "Line": {
                             strokeWidth: 1,
@@ -144,7 +144,7 @@
                     }),
                     symbolizer: {
                         "Point": {
-                            externalGraphic: "http://app.macnoise.com/planeicon/airplane_red${heading}.png"
+                            externalGraphic: OpenNoms.config.URLs.planeIcons + "airplane_red${heading}.png"
                         }
                     }
                 }),
@@ -156,7 +156,7 @@
                     }),
                     symbolizer: {
                         "Point": {
-                            externalGraphic: "http://app.macnoise.com/planeicon/airplane_green${heading}.png"
+                            externalGraphic: OpenNoms.config.URLs.planeIcons + "airplane_green${heading}.png"
                         }
                     }
                 })

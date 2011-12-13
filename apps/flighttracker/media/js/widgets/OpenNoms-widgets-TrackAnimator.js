@@ -10,7 +10,7 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
         type: 'hbox'
     },
     baseCls: 'x-plain',
-    style: 'margin-top: 2px; margin-left: 15px;',
+    style: 'margin-top: 2px; margin-left: 2px;',
     height: 22,
     border: '0 0 0 0',
 

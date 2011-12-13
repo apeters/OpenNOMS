@@ -3,7 +3,6 @@
     alias: 'widgets.opennoms-widgets-legend',
 
     id: 'legend-grid',
-    title: 'Legend',
     hideHeaders: true,
 
     initComponent: function () {

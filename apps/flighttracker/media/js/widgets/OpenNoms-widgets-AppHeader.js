@@ -284,7 +284,7 @@
                     data: [
 	                    { "value": 'flight_id', "text": 'Flight ID' },
 	                    { "value": 'airline', "text": 'Airline' },
-	                    { "value": 'altitude', "text": 'Altitude (Feet above MSP Field)' },
+	                    { "value": 'altitude', "text": 'Altitude (Ft above MSP)' },
 	                    { "value": 'heading', "text": 'Heading (Degrees)' },
 	                    { "value": 'actype', "text": 'Aircraft Type' },
 	                    { "value": 'speed', "text": 'Speed (MPH)' }
