@@ -121,7 +121,7 @@ OpenNoms.app = {
                 Ext.each(this.appPanel.mapPanel.map.layers, function (layer, index, allLayers) {
                     if (layer.showInLegend) {
                         var store = Ext.getCmp('legend-grid').store;
-                        store.add({ 'name': layer.name, 'layer': layer, 'isOn': layer.getVisibility() });
+                        store.insert(0, { 'name': layer.name, 'layer': layer, 'isOn': layer.getVisibility() });
                         layer.events.on({
                             'visibilitychanged': function (e) {
                                 var store = Ext.getCmp('legend-grid').store;

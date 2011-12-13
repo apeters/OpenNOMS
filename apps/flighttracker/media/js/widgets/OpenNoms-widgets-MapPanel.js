@@ -52,6 +52,20 @@
 
         this.callParent(arguments);
 
+        //layer to display LMIC aerial photography WMS
+        this.ortho = new OpenLayers.Layer.WMS("Aerial Photography", OpenNoms.config.URLs.aerial, {
+            layers:'nga2008,fsa2009'
+        },{
+            tileSize:new OpenLayers.Size(512,512),
+            projection:this.supportedProjections.utm, 
+            maxExtent:new OpenLayers.Bounds(411482,4900449,552143,5041149), 
+            maxResolution:274.8046875, 
+            opacity:0.7,
+            buffer:0,
+            visibility: false,
+            showInLegend: true
+        });
+
         //tiled version of MAC base layers from MapProxy
         this.tmsbase = new OpenLayers.Layer.TMS('Base Map', OpenNoms.config.URLs.tms, { 
             layername: 'base_EPSG26915', 
@@ -298,7 +312,7 @@
             }
         );
 
-        this.map.addLayers([this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.animatedFlightTracks, this.selectedFlightTrackLayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
+        this.map.addLayers([this.ortho, this.tmsbase, this.tmscontours, this.tmsrmts, this.staticflightlayer, this.animatedFlightTracks, this.selectedFlightTrackLayer, this.noiseEventLayer, this.addressSearchLayer, this.measureLayer]);
 
         this.noiseEventHoverControl = new OpenLayers.Control.SelectFeature(this.noiseEventLayer, {
             multiple: false, 
