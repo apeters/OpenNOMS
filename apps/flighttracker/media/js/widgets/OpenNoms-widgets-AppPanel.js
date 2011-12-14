@@ -168,17 +168,17 @@
                         xtype: 'container',
                         html: '<div style="font-weight:bold;">Flight Track Display:</div>' +
                             '​<div id="staticflightlegend">' +
-                                '<img src="Media/images/redline.png" style="padding-left:30px;padding-right:6px;">Arrival' +
-                                '<img src="Media/images/greenline.png" style="padding-left:30px;padding-right:6px;">Departure' +
-                                '<img src="Media/images/blueline.png" style="padding-left:30px;padding-right:6px;">Untagged' +
+                                '<img src="Media/images/redline.png" style="padding-left:40px;padding-right:6px;">Arrivals' +
+                                '<img src="Media/images/greenline.png" style="padding-left:40px;padding-right:6px;">Departures' +
+                                '<img src="Media/images/blueline.png" style="padding-left:40px;padding-right:6px;">Untagged' +
                             '</div>'
                     }, {
                         xtype: 'container',
                         html: '<div style="font-weight:bold;">Animated Flight Display:</div>' +
                             '​<div id="animatedflightlegend">' +
-                                '<img src="Media/images/airplane_red.png" style="padding-left:30px;padding-right:6px;">Arrival' +
-                                '<img src="Media/images/airplane_green.png" style="padding-left:30px;padding-right:6px;">Departure' +
-                                '<img src="Media/images/airplane_blue.png" style="padding-left:30px;padding-right:6px;">Untagged' +
+                                '<img src="Media/images/airplane_red.png" style="padding-left:40px;padding-right:6px;">Arrivals' +
+                                '<img src="Media/images/airplane_green.png" style="padding-left:40px;padding-right:6px;">Departures' +
+                                '<img src="Media/images/airplane_blue.png" style="padding-left:40px;padding-right:6px;">Untagged' +
                             '</div>'
                     }],
                     region: 'north'
@@ -242,6 +242,52 @@
                 },
                 scope: this,
                 single: true
+            }
+        });
+
+        this.linkURLWindow = Ext.create('Ext.window.Window', {
+            title: 'Link for Email',
+            modal: true,
+            height: 110,
+            width: 420,
+            layout: 'fit',
+            closeAction: 'hide',
+            items: [{
+                xtype: 'form',
+                bodyPadding: 5,
+                layout: 'anchor',
+                defaults: {
+                    anchor: '100%',
+                    labelWidth: 30
+                },
+                // The fields
+                defaultType: 'textfield',
+                items: [{
+                    fieldLabel: 'URL',
+                    id: 'linkurltextfield',
+                    name: 'url',
+                    allowBlank: false,
+                    value: 'asfdafsasdf',
+                    readOnly: true,
+                    selectOnFocus: true
+                }],
+                // Reset and Submit buttons
+                buttons: [{
+                    text: 'Close',
+                    handler: function () {
+                        this.linkURLWindow.hide();
+                    },
+                    scope: this
+                }]
+            }],
+            closable: true,
+            draggable: false,
+            resizable: false,
+            listeners: {
+                'show': function () {
+                    Ext.getCmp('linkurltextfield').selectText();
+                },
+                scope: this
             }
         });
 

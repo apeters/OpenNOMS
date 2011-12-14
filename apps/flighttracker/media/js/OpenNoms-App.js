@@ -5,12 +5,25 @@ OpenNoms.app = {
         Ext.tip.QuickTipManager.init();
         this.loadingMask = Ext.Msg.wait('Initializing...');
 
+        this.updateAppConfig();
         this.buildUI();
         this.applyListeners();
         this.loadData();
         this.initControllers();
 
         this.loadingMask.hide();
+    },
+
+    updateAppConfig: function () {
+        var queryStringObj = Ext.Object.fromQueryString(window.location.search);
+        Ext.Object.each(queryStringObj, function (key, value, obj) {
+            if (value === 'true') {
+                obj[key] = true;
+            } else if (value === 'false') {
+                obj[key] = false;
+            }
+        }, this);
+        Ext.apply(OpenNoms.config.AppConfig, queryStringObj);
     },
 
     /*
@@ -48,6 +61,10 @@ OpenNoms.app = {
                         this.appPanel.mapPanel.drawDistanceMeasureControl.activate();
                     }
                 }
+            },
+            'emailclicked': function () {
+                Ext.getCmp('linkurltextfield').setValue(this.getLinkURL());
+                this.appPanel.linkURLWindow.show();
             },
             scope: this
         });
@@ -216,14 +233,6 @@ OpenNoms.app = {
             scope: this
         });
 
-        Ext.getCmp('select-flights').store.on({
-            'load': function (store, record, operation, opts) {
-                this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
-                this.appPanel.mapPanel.staticflightlayer.setVisibility(true);
-            },
-            scope: this
-        });
-
         Ext.getCmp('find-address-combo').on({
             'select': function (combo, records, opts) {
                 var geom = new OpenLayers.Geometry.Point(records[0].get('x'), records[0].get('y'));
@@ -254,14 +263,71 @@ OpenNoms.app = {
     * load the data into the app
     */
     loadData: function () {
-        Ext.getCmp('select-flights').store.load();
+        Ext.getCmp('select-flights').store.load({
+            scope: this,
+            callback: function () {
+                this.updateAppFromConfig();
+            }
+        });
     },
 
     initControllers: function () {
 
     },
 
+    updateAppFromConfig: function () {
+        var filters = OpenNoms.config.AppConfig.filter.split(',');
+        Ext.each(filters, function (item, index, allItems) {
+            if (item != "") {
+                var recordIndex = Ext.getCmp('select-flights').store.findExact('value', item);
+                if (recordIndex > -1) {
+                    var rec = Ext.getCmp('select-flights').store.getAt(recordIndex);
+                    rec.set('ischecked', false);
+                    rec.commit();
+                }
+            }
+        }, this);
+        this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
+        this.appPanel.mapPanel.staticflightlayer.setVisibility(true);
+
+        if (this.stateController.state != OpenNoms.config.AppConfig.state) {
+            this.stateController.changeState(OpenNoms.config.AppConfig.state);
+        }
+    },
+
     showApp: function () {
         this.viewport.layout.setActiveItem(1);
+    },
+
+    getLinkURL: function () {
+        var filters = '';
+        Ext.getCmp('select-flights').store.data.each(function (item, index, allItems) {
+            if (!item.get('ischecked')) {
+                if (filters == '') {
+                    filters = item.get('value');
+                } else {
+                    filters = filters + ',' + item.get('value');
+                }
+            }
+        }, this);
+        var newAppConfig = {
+            extent: this.appPanel.mapPanel.map.getExtent().toString(),
+            state: this.stateController.state,
+            date: Ext.getCmp('flighttrackstartdatepicker').getValue().getTime(),
+            time: Ext.getCmp('flighttrackstarttimepicker').getRawValue(),
+            length: Ext.getCmp('staticlengthcombo').getValue(),
+            truncate: Ext.getCmp('truncate-flight-tracks-checkbox').getValue(),
+            display: Ext.getCmp('display-type-combo').getValue(),
+            speed: Ext.getCmp('animationspeedcombo').getValue(),
+            basemap: this.appPanel.mapPanel.tmsbase.getVisibility(),
+            aerial: this.appPanel.mapPanel.ortho.getVisibility(),
+            contours: this.appPanel.mapPanel.tmscontours.getVisibility(),
+            rmts: this.appPanel.mapPanel.tmsrmts.getVisibility(),
+            filter: filters
+        };
+        var queryString = '?' + Ext.Object.toQueryString(newAppConfig);
+        var url = OpenNoms.config.URLs.app + queryString;
+
+        return url;
     }
 };

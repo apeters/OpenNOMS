@@ -16,11 +16,15 @@
         this.addEvents({
             'measureclicked': true,
             'changestate': true,
-            'setdatetimerange': true
+            'setdatetimerange': true,
+            'emailclicked': true
         });
 
         var yesterday = new Date();
         yesterday.setDate(new Date().getDate() - 1);
+
+        var defaultDate = new Date();
+        defaultDate.setTime(OpenNoms.config.AppConfig.date);
 
         this.items = [{
             xtype: 'panel',
@@ -113,7 +117,7 @@
                     iconAlign: 'top',
                     text: '',
                     handler: function () {
-                        Ext.Msg.alert('Under Construction', 'This feature is coming soon!');
+                        this.fireEvent('emailclicked');
                     },
                     scope: this,
                     scale: 'medium'
@@ -205,7 +209,7 @@
                 width: 170,
                 name: 'staticstartdate',
                 maxValue: yesterday,
-                value: yesterday
+                value: defaultDate
             },{
                 xtype: 'timefield',
                 id: 'flighttrackstarttimepicker',
@@ -216,13 +220,13 @@
                 width: 160,
                 minValue: '12:00 AM',
                 maxValue: '11:55 PM',
-                value: '1:00 PM',
+                value: OpenNoms.config.AppConfig.time,
                 increment: 5
             },{
                 xtype: 'combo',
                 id: 'staticlengthcombo',
                 name: 'staticlength',
-                value: 600000,
+                value: OpenNoms.config.AppConfig.length,
                 forceSelection:true,
                 labelWidth: 45,
                 labelAlign: 'right',
@@ -258,7 +262,7 @@
                 xtype: 'checkboxfield',
                 id: 'truncate-flight-tracks-checkbox',
                 name: 'truncateflighttracks',
-                value: false,
+                checked: OpenNoms.config.AppConfig.truncate,
                 labelWidth: 160,
                 labelAlign: 'right',
                 width: 185,
@@ -273,7 +277,7 @@
                 xtype: 'combo',
                 id: 'display-type-combo',
                 name: 'displaytype',
-                value: 'altitude',
+                value: OpenNoms.config.AppConfig.display,
                 forceSelection:true,
                 labelWidth: 45,
                 labelAlign: 'right',
@@ -323,7 +327,7 @@
                 hidden: true,
                 flex: 1,
                 span: 20, // seconds of "tail" to show
-                speed: 10, // play at 150x real time
+                speed: OpenNoms.config.AppConfig.speed, // play at 150x real time
 		        frameRate: Ext.isIE?1:4,
                 listeners:{
                     'afterrender': function(){

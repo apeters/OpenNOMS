@@ -62,7 +62,7 @@
             maxResolution:274.8046875, 
             opacity:0.7,
             buffer:0,
-            visibility: false,
+            visibility: OpenNoms.config.AppConfig.aerial,
             showInLegend: true
         });
 
@@ -73,7 +73,8 @@
             tileSize: new OpenLayers.Size(512, 512), 
             opacity: 0.7, 
             buffer: 0,
-            showInLegend: true
+            showInLegend: true,
+            visibility: OpenNoms.config.AppConfig.basemap
         });
 
         
@@ -88,7 +89,7 @@
                 opacity:0.7,
                 buffer:0,
                 showInLegend: true,
-                visibility: false
+                visibility: OpenNoms.config.AppConfig.contours
 	        }
         );
 
@@ -103,7 +104,7 @@
                 opacity:0.7,
                 buffer:0,
                 showInLegend: true,
-                visibility: false
+                visibility: OpenNoms.config.AppConfig.rmts
 	        }
         );
 
@@ -392,7 +393,7 @@
             this.doLayout();
         });
 
-        this.map.zoomTo(4);
+        this.map.zoomToExtent(new OpenLayers.Bounds(OpenNoms.config.AppConfig.extent.split(',')));
 
         this.doLayout();
 

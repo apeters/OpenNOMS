@@ -21,47 +21,7 @@
                     'outputFormat': 'json'
                 }
             }),
-            autoLoad: false,
-            listeners: {
-                'update': function (store, record, operation, opts) {
-                    var group = record.get('group');
-                    var groupNodeEl = Ext.get('groupcheck' + group).up('dl');
-                    var records = store.queryBy(function (rec, id) {
-                        return (rec.data[store.groupField] == group);
-                    }, this);
-                    var allOn = true;
-                    var allOff = true;
-                    records.each(function (item, index, allItems) {
-                        if (item.get('ischecked')) {
-                            allOff = false;
-                        } else {
-                            allOn = false
-                        }
-                    }, this);
-                    if (!allOff && !allOn) {
-                        if (groupNodeEl.hasCls('x-grid-row-checked')) {
-                            groupNodeEl.removeCls('x-grid-row-checked');
-                        }
-                        if (!groupNodeEl.hasCls('x-grid-row-partialchecked')) {
-                            groupNodeEl.addCls('x-grid-row-partialchecked');
-                        }
-                    } else {
-                        if (groupNodeEl.hasCls('x-grid-row-partialchecked')) {
-                            groupNodeEl.removeCls('x-grid-row-partialchecked');
-                        }
-                        if (allOn) {
-                            if (!groupNodeEl.hasCls('x-grid-row-checked')) {
-                                groupNodeEl.addCls('x-grid-row-checked');
-                            }
-                        } else {
-                            if (groupNodeEl.hasCls('x-grid-row-checked')) {
-                                groupNodeEl.removeCls('x-grid-row-checked');
-                            }
-                        }
-                    }
-                },
-                scope: this
-            }
+            autoLoad: false
         });
 
         this.columns = [{
@@ -101,6 +61,61 @@
         }];
 
         this.callParent(arguments);
+
+        this.on({
+            'viewready': function () {
+                this.store.on({
+                    'update': function (store, record, operation, opts) {
+                        this.updateGroup(store, record);
+                    },
+                    scope: this
+                });
+
+                this.store.data.each(function (record, index, allRecords) {
+                    this.updateGroup(this.store, record);
+                }, this);
+            },
+            scope: this,
+            single: true
+        });
+    },
+
+    updateGroup: function (store, record) {
+        var group = record.get('group');
+        var groupNodeEl = Ext.get('groupcheck' + group).up('dl');
+        var records = store.queryBy(function (rec, id) {
+            return (rec.data[store.groupField] == group);
+        }, this);
+        var allOn = true;
+        var allOff = true;
+        records.each(function (item, index, allItems) {
+            if (item.get('ischecked')) {
+                allOff = false;
+            } else {
+                allOn = false
+            }
+        }, this);
+        if (!allOff && !allOn) {
+            if (groupNodeEl.hasCls('x-grid-row-checked')) {
+                groupNodeEl.removeCls('x-grid-row-checked');
+            }
+            if (!groupNodeEl.hasCls('x-grid-row-partialchecked')) {
+                groupNodeEl.addCls('x-grid-row-partialchecked');
+            }
+        } else {
+            if (groupNodeEl.hasCls('x-grid-row-partialchecked')) {
+                groupNodeEl.removeCls('x-grid-row-partialchecked');
+            }
+            if (allOn) {
+                if (!groupNodeEl.hasCls('x-grid-row-checked')) {
+                    groupNodeEl.addCls('x-grid-row-checked');
+                }
+            } else {
+                if (groupNodeEl.hasCls('x-grid-row-checked')) {
+                    groupNodeEl.removeCls('x-grid-row-checked');
+                }
+            }
+        }
     }
 });
 
