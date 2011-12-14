@@ -21,6 +21,11 @@
         layer.mergeNewParams({ viewparams: this.formatParamsForGeoserver() });
     },
 
+    getAniatedFlightData: function (store) {
+        store.proxy.extraParams.viewparams = this.formatParamsForGeoserver();
+        store.load();
+    },
+
     getFlightParams: function () {
         var flights = Ext.getCmp('select-flights');
         var params = {};
@@ -75,6 +80,7 @@
     formatParamsForGeoserver: function () {
         var params = this.getFlightParams();
         params.isorange = this.getIsoRange();
+        params.step = 2;
         if (Ext.getCmp('truncate-flight-tracks-checkbox').getValue()) {
             params.timesubset = 't';
         } else {
