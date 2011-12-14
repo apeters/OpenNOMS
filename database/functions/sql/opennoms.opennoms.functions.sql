@@ -709,7 +709,7 @@ $BODY$
 			round(st_x(geom))::int as x,
 			round(st_y(geom))::int as y,
 			round(st_z(geom)*3.2808399)::int as z,
-			(st_m(geom)::text || ' seconds')::interval + $2 as "time",
+			(st_m(geom)::text || ' seconds')::interval + $2 || '00' as "time",
 			round(opennoms.mac_heading(lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over ())/10.0)::int * 10 as heading,
 			round(opennoms.mac_speed(lag(geom,3) over (),lag(geom,2) over (),lag(geom,1) over (),geom,lead(geom,1) over (),lead(geom,2) over (),lead(geom,3) over ())*2.236936)::int as speed
 		FROM st_dumppoints(opennoms.everynseconds($1,$3)) 
