@@ -58,6 +58,7 @@
                     Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
                     Ext.getCmp('map-panel').animatedFlightTracks.removeAllFeatures();
                     Ext.getCmp('flight-legend-display-region').layout.setActiveItem(1);
+                    Ext.getCmp('queryController').getRealtimeFlightData(Ext.getCmp('tabtrackanimator').store);
                     this.state = 'realtime';
                     break;
                 case 'animated':

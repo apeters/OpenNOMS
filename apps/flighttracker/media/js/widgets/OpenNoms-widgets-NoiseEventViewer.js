@@ -11,8 +11,8 @@
                 { name: 'eventid', type: 'number' },
                 { name: 'opnum', type: 'number' },
                 { name: 'rmt', type: 'number' },
-                { name: 'stime', type: 'date' },
-                { name: 'mtime', type: 'date' },
+                { name: 'stime', type: 'date', dateFormat: 'c' },
+                { name: 'mtime', type: 'date', dateFormat: 'c'},
                 { name: 'duration', type: 'number' },
                 { name: 'leq', type: 'number' },
                 { name: 'sel', type: 'number' },
@@ -38,7 +38,7 @@
             { header: 'LMax (db)', dataIndex: 'lmax', width: 56 },
             { header: 'LEQ (db)', dataIndex: 'leq', width: 50 },
             { header: 'SEL (db)', dataIndex: 'sel', width: 50 },
-            { header: 'Max Time', dataIndex: 'mtime', xtype: 'datecolumn', format: 'F j, Y, g:i:s a', flex: 1 },
+            { header: 'Max Time', dataIndex: 'mtime', xtype: 'datecolumn', format: 'm-d-Y g:i:s a', flex: 1 },
             { header: 'Duration (s)', dataIndex: 'duration', width: 66 }
         ];
 

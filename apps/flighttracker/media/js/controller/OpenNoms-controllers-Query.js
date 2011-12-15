@@ -26,6 +26,11 @@
         store.load();
     },
 
+    getRealtimeFlightData: function (store) {
+        store.proxy.extraParams.viewparams = this.formatParamsForGeoserver(900000);
+        store.load();
+    },
+
     getFlightParams: function () {
         var flights = Ext.getCmp('select-flights');
         var params = {};

@@ -161,7 +161,7 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
 		              { name: "when", type: "date", dateFormat: 'c' },
 		              { name: "heading", type: "number" },
 		              { name: "altitude", type: "number" },
-		              { name: "actype", type: "string" },
+		              { name: "mactype", type: "string" },
 		              { name: "airline", type: "string" },
 		              { name: "trackId", type: "number", mapping: "opnum" },
 		              { name: "flight_id", type: "string" }
