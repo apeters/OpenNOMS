@@ -139,7 +139,7 @@
                             '<p>No Flight Track Selected</p>',
                         '</tpl>',
                         '<tpl if="opnum != \'no flight\'">',
-                            '<p><span style="font-weight:bold;">Flight #:</span> {flight_id}, <span style="font-weight:bold;">Airport:</span> {airport}, <span style="font-weight:bold;">Airline:</span> {airline}, <span style="font-weight:bold;">Aircraft:</span> {actype}</p>',
+                            '<p><span style="font-weight:bold;">Flight #:</span> {flight_id}, <span style="font-weight:bold;">Airport:</span> {airport}, <span style="font-weight:bold;">Airline:</span> {airline}, <span style="font-weight:bold;">Aircraft:</span> {mactype}</p>',
                         '</tpl>'
                     ),
                     data: { opnum: 'no flight' },

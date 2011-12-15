@@ -290,7 +290,7 @@
 	                    { "value": 'airline', "text": 'Airline' },
 	                    { "value": 'altitude', "text": 'Altitude (Ft above MSP)' },
 	                    { "value": 'heading', "text": 'Heading (Degrees)' },
-	                    { "value": 'actype', "text": 'Aircraft Type' },
+	                    { "value": 'mactype', "text": 'Aircraft Type' },
 	                    { "value": 'speed', "text": 'Speed (MPH)' }
                     ]
                 }),

@@ -470,11 +470,11 @@ return $return;$BODY$
 ALTER FUNCTION opennoms.regex_replace(text, text, text) OWNER TO postgres;
 
 
--- Function: opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text)
+-- Function: opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text)
 
--- DROP FUNCTION opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text);
+-- DROP FUNCTION opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text);
 
-CREATE OR REPLACE FUNCTION opennoms.grabflights_opennoms2(isorange text, airport text DEFAULT ''::text, optypein text DEFAULT ''::text, adflagin text DEFAULT ''::text, runwayin text DEFAULT ''::text, nightmode text DEFAULT ''::text, timemode text DEFAULT ''::text, timesubset text DEFAULT ''::text, publicmode text DEFAULT ''::text, mactypein text DEFAULT ''::text, airlinein text DEFAULT ''::text, minalt text DEFAULT ''::text, maxalt text DEFAULT ''::text, extrasql text DEFAULT ''::text)
+CREATE OR REPLACE FUNCTION opennoms.grabflights_opennoms2(isorange text, airport text DEFAULT ''::text, adflagin text DEFAULT ''::text, runwayin text DEFAULT ''::text, timemode text DEFAULT ''::text, timesubset text DEFAULT ''::text, publicmode text DEFAULT ''::text, mactypein text DEFAULT ''::text, airlinein text DEFAULT ''::text, minalt text DEFAULT ''::text, maxalt text DEFAULT ''::text, extrasql text DEFAULT ''::text)
   RETURNS SETOF opennoms.operations_view AS
 $BODY$declare
 iso_arr text[];
@@ -487,7 +487,7 @@ statement text;
 retval opennoms.operations_view;
 sdlimit timestamp;
 edlimit timestamp;
-optype text := optypein;
+--optype text := optypein;
 runway text :=runwayin;
 adflag text :=adflagin;
 mactype text :=mactypein;
@@ -527,7 +527,7 @@ g := ' geometryn(st_multi(st_locatebetweenelevations(' || g || ', ' || minalt ||
 end if;
 g := g || ' as targets';
 statement := statement || '
-select opnum,stime,etime,runwaytime,actype,mactype,airport,adflag,runway,airline,beacon,flight_id,night,inmnight,opertype,stage,image,manufactured,takeoffnoise,description,otherport,';
+select opnum,stime,etime,mactype,airport,adflag,runway,airline,flight_id,description,otherport,';
 statement := statement || g;
 statement := statement || '
 from operations_view where ';
@@ -536,9 +536,7 @@ from operations_view where ';
 
 statement := statement || '''' || sd || ''' < stime AND ''' || ed || ''' > etime AND ';
 
-if (timemode = 'runwaytime') then
-	statement := statement || ' runwaytime between ''' || sd || ''' and ''' || ed || ''' and ';
-elsif (timemode = 'stime' or timemode = 'starttime') then
+if (timemode = 'stime' or timemode = 'starttime') then
 	statement := statement || ' stime between ''' || sd || ''' and ''' || ed || ''' and ';
 elsif (timemode = 'etime' or timemode = 'endtime') then
 	statement := statement || ' etime between ''' || sd || ''' and ''' || ed || ''' and ';
@@ -550,32 +548,13 @@ if (airport='MSP') then
 	statement := statement || ' runway in (''12L'',''12R'',''30L'',''30R'',''17'',''35'',''04'',''22'') and ';
 end if;
 
-statement := statement || parselist(optype,'opertype','^[a-z](,[a-z])*$') || ' and ';
 
 statement := statement || parselist(adflag,'adflag','^[ado](,[ado])*$') || ' and ';
 
 statement := statement || parselist(runway,'runway','^([0-9][0-9]?[A-Z]?)(,[0-9][0-9]?[A-Z]?)*$') || ' and ';
 
-
-if (upper(nightmode)='TRUE' or upper(nightmode)='T') or upper(nightmode)='NIGHT' then
-	raise notice 'filtered by night flights';
-	statement := statement || ' 
-	night=true and ';
-elsif (upper(nightmode)='FALSE' or upper(nightmode)='F') then
-	raise notice 'filtered by night flights (day only)';
-	statement := statement || ' 
-	(night=false or night is null) and ';
-elsif (upper(nightmode)='INMNIGHT' or upper(nightmode)='INM') then
-	raise notice 'filtered by inm night flights';
-	statement := statement || ' 
-	(inmnight=true) and '; 
-elsif (upper(nightmode)='INMDAY') then
-	raise notice 'filtered by inm night flights';
-	statement := statement || ' 
-	(inmnight=false or inmnight is null) and '; 
-end if;
-
 statement := statement || parselist(mactype,'mactype','^[a-z0-9]+(,[a-z0-9])*$') || ' and ';
+
 statement := statement || parselist(airline,'airline','^[a-z]{3}(,[a-z]{3})*$') || ' and ';
 
 
@@ -598,7 +577,7 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text, text, text) OWNER TO postgres;
+ALTER FUNCTION opennoms.grabflights_opennoms2(text, text, text, text, text, text, text, text, text, text, text, text) OWNER TO postgres;
 
 
 -- Function: opennoms.everynseconds(geometry, integer)
