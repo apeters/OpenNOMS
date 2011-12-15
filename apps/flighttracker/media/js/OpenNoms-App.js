@@ -32,9 +32,9 @@ OpenNoms.app = {
     buildUI: function () {
         this.appPanel = Ext.create('OpenNoms.widgets.AppPanel');
 
-        this.stateController = Ext.create('OpenNoms.controller.State', {id:'stateController'});
+        this.stateController = Ext.create('OpenNoms.controller.State', { id: 'stateController' });
 
-        this.queryController = Ext.create('OpenNoms.controller.Query', {id:'queryController'});
+        this.queryController = Ext.create('OpenNoms.controller.Query', { id: 'queryController' });
 
 
         this.viewport = new Ext.Viewport({
@@ -77,6 +77,25 @@ OpenNoms.app = {
             scope: this.stateController
         });
 
+        // handle the display of the "loading" gif
+        this.appPanel.mapPanel.staticflightlayer.events.register('loadstart', this, function () {
+            this.stateController.loadingData(true);
+        });
+
+        Ext.getCmp('tabtrackanimator').store.on('beforeload', function () {
+            this.stateController.loadingData(true);
+        }, this);
+
+        this.appPanel.mapPanel.staticflightlayer.events.register('loadend', this, function () {
+            this.stateController.loadingData(false);
+        });
+
+        Ext.getCmp('tabtrackanimator').store.on('load', function () {
+            this.stateController.loadingData(false);
+        }, this);
+
+
+        // handle the click of the "refesh" button
         this.appPanel.appHeader.on({
             'setdatetimerange': function () {
                 switch (this.stateController.state) {

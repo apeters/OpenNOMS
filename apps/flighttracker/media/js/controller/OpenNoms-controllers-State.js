@@ -13,6 +13,13 @@
         this.callParent(arguments)
     },
 
+    loadingData: function (isLoading) {
+        if (isLoading) {
+            Ext.getCmp('gobutton').setIconCls('loading');
+        } else {
+            Ext.getCmp('gobutton').setIconCls('refresh');
+        }
+    },
 
     changeState: function (state) {
         if (this.fireEvent('beforestatechange')) {

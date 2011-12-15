@@ -64,6 +64,9 @@
 .microphone {
 	background-image:url(../images/microphone.png) !important;
 }
+.loading{
+    background-image: url("http://cdn.sencha.io/ext-4.0.7-gpl/resources/themes/images/default/grid/loading.gif");
+}
 .icon-center {
     background-position: 50% 50%;
 }

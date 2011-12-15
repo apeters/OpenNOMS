@@ -22,7 +22,7 @@
     },
 
     getAniatedFlightData: function (store) {
-        store.proxy.extraParams.viewparams = this.formatParamsForGeoserver();
+        store.proxy.extraParams.viewparams = this.formatParamsForGeoserver(900000);
         store.load();
     },
 
@@ -68,18 +68,22 @@
         return params;
     },
 
-    getIsoRange: function () {
+    getIsoRange: function (timelimit) {
         var startDate = Ext.getCmp('flighttrackstartdatepicker').getValue();
         var startTime = Ext.getCmp('flighttrackstarttimepicker').getValue();
         startDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds());
         endDate = new Date();
-        endDate.setTime(startDate.getTime() + Ext.getCmp('staticlengthcombo').getValue());
+        if (timelimit) {
+            endDate.setTime(startDate.getTime() + timelimit);
+        } else {
+            endDate.setTime(startDate.getTime() + Ext.getCmp('staticlengthcombo').getValue());
+        }
         return Ext.Date.format(startDate, 'Y-m-d H\\\\:i\\\\:s') + '/' + Ext.Date.format(endDate, 'Y-m-d H\\\\:i\\\\:s');
     },
 
-    formatParamsForGeoserver: function () {
+    formatParamsForGeoserver: function (timelimit) {
         var params = this.getFlightParams();
-        params.isorange = this.getIsoRange();
+        params.isorange = this.getIsoRange(timelimit);
         params.step = 2;
         if (Ext.getCmp('truncate-flight-tracks-checkbox').getValue()) {
             params.timesubset = 't';
