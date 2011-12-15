@@ -65,6 +65,7 @@
                     Ext.getCmp('noise-event-viewer').store.removeAll();
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
                     Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
+                    Ext.getCmp('queryController').getAniatedFlightData(Ext.getCmp('tabtrackanimator').store);
                     Ext.getCmp('flight-legend-display-region').layout.setActiveItem(1);
                     this.state = 'animated';
                     break;

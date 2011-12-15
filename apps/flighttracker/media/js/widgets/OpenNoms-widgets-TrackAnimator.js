@@ -49,12 +49,12 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
     */
     url: null,
 
-    /** api: config[protocolOptions]
-    *  ``Object``
-    *  If a ``url`` the HTTP protocol will be used to request features.
-    *  Any options to the HTTP protocol can be specified in this property.
+
+    /**
+    *  ``String``
+    *  Extra parameters to be sent with every request
     */
-    protocolOptions: null,
+    extraParams: null,
 
     /** api: config[formatOptions]
     *  ``Object``
@@ -156,14 +156,9 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                 extractTracks: true
             });
 
-            //            var protocolOptions = Ext.apply(this.protocolOptions || {}, {
-            //                url: this.url,
-            //                format: new OpenLayers.Format.Text(formatOptions)
-            //            });
-
             this.store = Ext.create('Ext.data.Store', {
                 fields: this.fields || [
-		              { name: "when", type: "date", dateFormat: 'Y-m-d H:i:s-G' },
+		              { name: "when", type: "date", dateFormat: 'c' },
 		              { name: "heading", type: "number" },
 		              { name: "altitude", type: "number" },
 		              { name: "actype", type: "string" },
@@ -173,9 +168,10 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                 ],
                 sortInfo: { field: 'when', direction: 'ASC' },
                 proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
-                    url: this.url
+                    url: this.url,
+                    extraParams: this.extraParams
                 }),
-                autoLoad: true,
+                autoLoad: false,
                 listeners: {
                     load: function (store) {
                         this.startTime = Number.POSITIVE_INFINITY;
@@ -198,15 +194,21 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                                 this.endTime = when;
                             }
                         }, this);
-                        this.shiftTime = this.endTime - 60000;
-                        this.slider.minValue = this.startTime;
-                        this.slider.maxValue = this.endTime;
-                        if (this.slider.getValue() < this.startTime || this.slider.getValue() > this.endTime) {
-                            this.slider.setValue(this.startTime);
+                        if (this.store.getCount() <= 1) {
+                            this.playPauseBtn.disable();
+                            this.updateSliderTip(this.slider, "No Data Available for Selected Date/Time", this.slider.thumbs[0]);
+                        } else {
+                            this.playPauseBtn.enable();
+                            this.shiftTime = this.endTime - 60000;
+                            this.slider.minValue = this.startTime;
+                            this.slider.maxValue = this.endTime;
+                            if (this.slider.getValue() < this.startTime || this.slider.getValue() > this.endTime) {
+                                this.slider.setValue(this.startTime);
+                            }
+
+                            this.updateDisplay();
                         }
 
-                        this.updateDisplay();
-                        if (this.store.getCount() <= 1) { this.dateDisplay.update("No Data Available for Selected Date/Time"); }
                     },
                     scope: this
                 }
@@ -215,23 +217,16 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
 
         this.relayEvents(this.store, ["load", "exception"]);
 
-        this.dateDisplay = Ext.create('Ext.Component', {
-            cls: "gxux-trackanimator-datedisplay",
-            autoEl: {
-                tag: "div",
-                html: ""
-            }
-        });
-
         this.playPauseBtn = Ext.create('Ext.Button', {
             id: 'animationplaybutton',
             iconCls: 'play',
             width: 65,
             text: 'Play',
             scope: this,
+            disabled: true,
             enableToggle: true,
-            handler: function () {
-                if (this.playPauseBtn.pressed) {
+            toggleHandler: function (btn, pressed) {
+                if (pressed) {
                     this.play();
                     this.playPauseBtn.setText('Pause');
                     this.playPauseBtn.setIconCls('pause');
@@ -261,11 +256,7 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                     if (!this.hidden) {
                         var t = new Date();
                         t.setTime(newValue);
-                        slider.plugins[0].show();
-                        slider.plugins[0].update(t.toTimeString())
-                        var xy = slider.plugins[0].el.getAlignToXY(thumb.el.id, 'b-t');
-                        xy[1] += -10;
-                        slider.plugins[0].showAt(xy);
+                        this.updateSliderTip(slider, t.toTimeString(), thumb);
                     }
                 },
                 changecomplete: this.updateDisplay,
@@ -300,9 +291,13 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
             listeners: {
                 scope: this,
                 'select': function (c) {
-                    this.stop();
-                    this.speed = c.value;
-                    this.play();
+                    if (this.playing) {
+                        this.stop();
+                        this.speed = c.value;
+                        this.play();
+                    } else {
+                        this.speed = c.value;
+                    }
                 }
             }
         });
@@ -365,6 +360,9 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
     },
 
 
+    /** 
+    *  Hide this component
+    */
     hide: function (date) {
         this.slider.plugins[0].hide();
         this.callParent(arguments);
@@ -375,7 +373,7 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
     */
     play: function () {
         if (this.playing) {
-            this.slider.setValue(this.startTime);
+            this.reset();
         } else {
             this.playing = true;
             var interval = 1000 / this.frameRate;
@@ -385,10 +383,10 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                 var time = this.slider.getValue() + increment;
                 if (time > this.endTime) {
                     if (this.repeat) {
-                        this.slider.setValue(this.startTime);
+                        this.reset();
+                        this.play();
                     } else {
-                        this.slider.setValue(this.startTime);
-                        this.stop();
+                        this.reset();
                         more = false;
                     }
                 } else {
@@ -415,7 +413,18 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
     */
     reset: function () {
         this.stop();
+        this.playPauseBtn.toggle(false);
         this.slider.setValue(this.startTime);
+        this.slider.plugins[0].hide();
+    },
+
+
+    updateSliderTip: function (slider, text, thumb) {
+        slider.plugins[0].show();
+        slider.plugins[0].update(text)
+        var xy = slider.plugins[0].el.getAlignToXY(thumb.el.id, 'b-t');
+        xy[1] += -10;
+        slider.plugins[0].showAt(xy);
     }
 
 });

@@ -94,7 +94,7 @@
             }, {
                 xtype: 'container',
                 layout: 'hbox',
-                width: 220,
+                width: 140,
                 style: 'padding-top: 2px;',
                 items: [{
                     xtype: 'button',
@@ -309,7 +309,7 @@
                     this.fireEvent('setdatetimerange');
                 },
                 scale: 'small'
-            },{
+            },'-',{
                 xtype: 'multislider',
                 id: 'staticslider',
                 flex: 1,
@@ -334,7 +334,15 @@
                         this.layer = OpenNoms.app.appPanel.mapPanel.animatedFlightTracks;
                     }
                 },
-		        url: 'http://localhost:8080/geoserver/opennoms/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opennoms:realtimetrack&viewparams=airport:MSP;isorange:2011-08-06%2016\\:00\\:00/2011-08-06%2016\\:15\\:00;optype:;x:480956;y:4970848;step:2;&outputFormat=json'
+		        url: OpenNoms.config.URLs.ows,
+                extraParams:{
+                    service:'WFS',
+                    request:'GetFeature',
+                    version:'1.0.0',
+                    typeName:'opennoms:realtimetrack',
+                    outputFormat:'json'
+                    //viewparams:'airport:MSP;isorange:2011-08-06 16\\\:00\\\:00/2011-08-06 16\\\:15\\\:00;optype:;x:480956;y:4970848;step:2;&outputFormat=json'
+                }
             }]
         }];
 

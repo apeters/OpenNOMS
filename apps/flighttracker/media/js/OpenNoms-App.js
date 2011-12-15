@@ -32,16 +32,19 @@ OpenNoms.app = {
     buildUI: function () {
         this.appPanel = Ext.create('OpenNoms.widgets.AppPanel');
 
+        this.stateController = Ext.create('OpenNoms.controller.State', {id:'stateController'});
+
+        this.queryController = Ext.create('OpenNoms.controller.Query', {id:'queryController'});
+
+
         this.viewport = new Ext.Viewport({
             layout: 'card',
             items: [
-                this.appPanel
+                this.appPanel,
+                this.stateController,
+                this.queryController
             ]
         });
-
-        this.stateController = Ext.create('OpenNoms.controller.State', {});
-
-        this.queryController = Ext.create('OpenNoms.controller.Query', {});
     },
 
     /*
@@ -76,7 +79,14 @@ OpenNoms.app = {
 
         this.appPanel.appHeader.on({
             'setdatetimerange': function () {
-                this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
+                switch (this.stateController.state) {
+                    case 'static':
+                        this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
+                        break;
+                    case 'animated':
+                        this.queryController.getAniatedFlightData(Ext.getCmp('tabtrackanimator').store);
+                        break;
+                }
             },
             scope: this
         });
