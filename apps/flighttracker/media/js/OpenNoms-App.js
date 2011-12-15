@@ -30,7 +30,41 @@ OpenNoms.app = {
     * setup all visual components
     */
     buildUI: function () {
-        this.appPanel = Ext.create('OpenNoms.widgets.AppPanel');
+        this.helpWindow = Ext.create('Ext.window.Window', {
+            title: 'Help',
+            height: 600,
+            width: 600,
+            autoScroll: true,
+            modal: true,
+            resizable: false,
+            draggable: false,
+            closeAction: 'hide',
+            loader: {
+                url: 'help.html',
+                renderer: 'html',
+                autoLoad: true
+            }
+        });
+
+        this.appPanel = Ext.create('OpenNoms.widgets.AppPanel', {
+            listeners: {
+                'afterrender': function () {
+                    Ext.get('feedback-link').on('click',
+                        function () {
+                            Ext.Msg.alert('Under Construction', 'This feature is coming soon!');
+                        }, this
+                    );
+
+                    Ext.get('help-link').on('click',
+                        function () {
+                            this.helpWindow.show();
+                        }, this
+                    );
+                },
+                scope: this,
+                single: true
+            }
+        });
 
         this.stateController = Ext.create('OpenNoms.controller.State', { id: 'stateController' });
 
@@ -69,6 +103,16 @@ OpenNoms.app = {
                 Ext.getCmp('linkurltextfield').setValue(this.getLinkURL());
                 this.appPanel.linkURLWindow.show();
             },
+            'setdatetimerange': function () {
+                switch (this.stateController.state) {
+                    case 'static':
+                        this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
+                        break;
+                    case 'animated':
+                        this.queryController.getAniatedFlightData(Ext.getCmp('tabtrackanimator').store);
+                        break;
+                }
+            },
             scope: this
         });
 
@@ -93,22 +137,6 @@ OpenNoms.app = {
         Ext.getCmp('tabtrackanimator').store.on('load', function () {
             this.stateController.loadingData(false);
         }, this);
-
-
-        // handle the click of the "refesh" button
-        this.appPanel.appHeader.on({
-            'setdatetimerange': function () {
-                switch (this.stateController.state) {
-                    case 'static':
-                        this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
-                        break;
-                    case 'animated':
-                        this.queryController.getAniatedFlightData(Ext.getCmp('tabtrackanimator').store);
-                        break;
-                }
-            },
-            scope: this
-        });
 
         this.appPanel.mapPanel.on({
             'distancemeasurecomplete': function (measureObj) {

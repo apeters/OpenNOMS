@@ -42,7 +42,7 @@
             }, {
                 xtype: 'container',
                 layout: 'fit',
-                html: '<a href="#" style="color: white;">Feedback</a><a style="padding-left: 10px; color: white;" href="#">Help</a>',
+                html: '<a href="#" style="color: white;" id="feedback-link">Feedback</a><a style="padding-left: 10px; color: white;" href="#" id="help-link">Help</a>',
                 width: 100,
                 style: 'padding-right:10px;padding-top: 5px;'
             }],
