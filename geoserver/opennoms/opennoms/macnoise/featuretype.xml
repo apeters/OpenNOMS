@@ -52,10 +52,8 @@
         <sql>SELECT * from opennoms.grabflights_opennoms2(&#xd;
     &apos;%isorange%&apos;, --isorange&#xd;
     &apos;%airport%&apos;,-- airport&#xd;
-    &apos;%optype%&apos;, --optypein&#xd;
     &apos;%adflag%&apos;, --adflagin&#xd;
     &apos;%runway%&apos;, --runwayin&#xd;
-    &apos;%nightmode%&apos;, --nightmode&#xd;
     &apos;%timemode%&apos;, --timemode&#xd;
     &apos;%timesubset%&apos;, --timesubset&#xd;
     &apos;%publicmode%&apos;, --publicmode&#xd;
@@ -89,17 +87,11 @@
           <name>minalt</name>
         </parameter>
         <parameter>
-          <name>optype</name>
-        </parameter>
-        <parameter>
           <name>airport</name>
           <defaultValue>MSP,STP,FCM,NONE</defaultValue>
         </parameter>
         <parameter>
           <name>mactype</name>
-        </parameter>
-        <parameter>
-          <name>nightmode</name>
         </parameter>
         <parameter>
           <name>isorange</name>
