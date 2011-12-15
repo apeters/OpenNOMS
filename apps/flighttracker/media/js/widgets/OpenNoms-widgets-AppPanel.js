@@ -301,6 +301,8 @@
                         this.noiseButton.alignTo(this.mapPanel, 'tr-tr', [-10, 60]);
                         this.legendButton.alignTo(this.mapPanel, 'tr-tr', [-10, 10]);
                         this.selectFlightsButton.alignTo(this.mapPanel, 'tr-tr', [-10, 110]);
+                        this.legendButton.query('button')[0].toggle(true);
+                        this.legendButton.query('button')[0].toggle(false);
                     },
                     'activate': function () {
                         this.noiseButton.show();
