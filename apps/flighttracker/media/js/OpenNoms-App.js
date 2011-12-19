@@ -355,7 +355,7 @@ OpenNoms.app = {
             filter: filters
         };
         var queryString = '?' + Ext.Object.toQueryString(newAppConfig);
-        var url = OpenNoms.config.URLs.app + queryString;
+        var url = window.location.protocol + "//" + window.location.host + (window.location.port != "" ? ":" + window.location.port : "") + window.location.pathname + queryString;
 
         return url;
     }
