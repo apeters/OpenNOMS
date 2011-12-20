@@ -42,7 +42,7 @@
             }, {
                 xtype: 'container',
                 layout: 'fit',
-                html: '<a href="#" style="color: white;">Feedback</a><a style="padding-left: 10px; color: white;" href="#">Help</a>',
+                html: '<a href="#" style="color: white;" id="feedback-link">Feedback</a><a style="padding-left: 10px; color: white;" href="#" id="help-link">Help</a>',
                 width: 100,
                 style: 'padding-right:10px;padding-top: 5px;'
             }],
@@ -270,7 +270,7 @@
             },{
                 xtype: 'container',
                 id: 'realtimemessage',
-                html: '(Flight display is delayed by 15 minutes.)',
+                html: '(Flight display is delayed by 16 minutes.)',
                 style: 'padding-left: 5px;',
                 hidden: true
             },{
