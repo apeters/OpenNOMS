@@ -17,18 +17,43 @@
     updateLayerWithNewParams: function (layer) {
         // here we'd get the time values for example and update the static flight track
         // for now lets just do this until we understand the time picker better
-        //layer.setUrl(OpenNoms.config.URLs.wms + '?viewparams=' + this.formatParamsForGeoserver());
-        layer.mergeNewParams({ viewparams: this.formatParamsForGeoserver() });
+        //layer.setUrl(OpenNoms.config.URLs.wms + '?viewparams=' + this.getAllParams());
+        layer.mergeNewParams({ viewparams: this.getAllParams() });
     },
 
-    getAniatedFlightData: function (store) {
-        store.proxy.extraParams.viewparams = this.formatParamsForGeoserver(900000);
-        store.load();
+    getAnimatedFlightData: function () {
+        var trackAnimator = Ext.getCmp('tabtrackanimator');
+        trackAnimator.playContinuously = false;
+        
+        var params = this.getFlightParams();
+        params.isorange = this.getIsoRange(900000);
+        params.step = 2;
+        params.timesubset = 't';
+
+        trackAnimator.extraParams.viewparams = this.formatParamsForGeoserver(params);
+        trackAnimator.startTime = this.getStartDateTime();
+        trackAnimator.endTime = this.getEndDateTime(900000);
+        trackAnimator.store.load();
     },
 
-    getRealtimeFlightData: function (store) {
-        store.proxy.extraParams.viewparams = this.formatParamsForGeoserver(900000);
-        store.load();
+    getRealtimeFlightData: function () {
+        var trackAnimator = Ext.getCmp('tabtrackanimator');
+        trackAnimator.startTime = 1312563600000; // 8/5/2011 10am
+        trackAnimator.endTime = 1312563660000;
+        Ext.getCmp('flighttrackstartdatepicker').setValue('8/5/2011');
+        Ext.getCmp('flighttrackstarttimepicker').setValue(10);
+
+        trackAnimator.playContinuously = true;
+        trackAnimator.speed = 1;
+
+        var params = {};
+        params.step = 1;
+        params.timesubset = 't';
+        params.isorange = this.getIsoRange(60000);
+        trackAnimator.extraParams.viewparams = this.formatParamsForGeoserver(params);
+        trackAnimator.params = params;
+        trackAnimator.formatParamsForGeoserver = this.formatParamsForGeoserver;
+        trackAnimator.store.load();
     },
 
     getFlightParams: function () {
@@ -74,19 +99,30 @@
     },
 
     getIsoRange: function (timelimit) {
+        var startDate = this.getStartDateTime();
+        var endDate = this.getEndDateTime(timelimit);
+        return Ext.Date.format(startDate, 'Y-m-d H\\\\:i\\\\:s') + '/' + Ext.Date.format(endDate, 'Y-m-d H\\\\:i\\\\:s');
+    },
+
+    getStartDateTime: function () {
         var startDate = Ext.getCmp('flighttrackstartdatepicker').getValue();
         var startTime = Ext.getCmp('flighttrackstarttimepicker').getValue();
         startDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds());
-        endDate = new Date();
+        return startDate;
+    },
+
+    getEndDateTime: function (timelimit) {
+        var endDate = new Date();
+        var startDate = this.getStartDateTime();
         if (timelimit) {
             endDate.setTime(startDate.getTime() + timelimit);
         } else {
             endDate.setTime(startDate.getTime() + Ext.getCmp('staticlengthcombo').getValue());
         }
-        return Ext.Date.format(startDate, 'Y-m-d H\\\\:i\\\\:s') + '/' + Ext.Date.format(endDate, 'Y-m-d H\\\\:i\\\\:s');
+        return endDate;
     },
 
-    formatParamsForGeoserver: function (timelimit) {
+    getAllParams: function (timelimit) {
         var params = this.getFlightParams();
         params.isorange = this.getIsoRange(timelimit);
         params.step = 2;
@@ -95,6 +131,11 @@
         } else {
             params.timesubset = 'f';
         }
+
+        return this.formatParamsForGeoserver(params);
+    },
+
+    formatParamsForGeoserver: function (params) {
         var ret = "";
         for (var propertyName in params) {
             ret += propertyName + ':' + params[propertyName] + ';';
@@ -102,4 +143,5 @@
 
         return ret;
     }
+
 });

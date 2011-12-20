@@ -28,6 +28,7 @@
             Ext.getCmp('staticlengthcombo').hide();
             Ext.getCmp('truncate-flight-tracks-checkbox').hide();
             Ext.getCmp('realtimemessage').hide();
+            Ext.getCmp('tabtrackanimator').stop();
             Ext.getCmp('tabtrackanimator').hide();
             Ext.getCmp('gobutton').hide();
             Ext.getCmp('display-type-combo').hide();
@@ -58,7 +59,8 @@
                     Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
                     Ext.getCmp('map-panel').animatedFlightTracks.removeAllFeatures();
                     Ext.getCmp('flight-legend-display-region').layout.setActiveItem(1);
-                    Ext.getCmp('queryController').getRealtimeFlightData(Ext.getCmp('tabtrackanimator').store);
+                    //Ext.getCmp('tabtrackanimator').show();
+                    Ext.getCmp('queryController').getRealtimeFlightData();
                     this.state = 'realtime';
                     break;
                 case 'animated':
@@ -73,7 +75,7 @@
                     Ext.getCmp('noise-event-viewer').store.removeAll();
                     Ext.getCmp('map-panel').noiseEventLayer.removeAllFeatures();
                     Ext.getCmp('map-panel').selectedFlightTrackLayer.removeAllFeatures();
-                    Ext.getCmp('queryController').getAniatedFlightData(Ext.getCmp('tabtrackanimator').store);
+                    Ext.getCmp('queryController').getAnimatedFlightData();
                     Ext.getCmp('flight-legend-display-region').layout.setActiveItem(1);
                     this.state = 'animated';
                     break;

@@ -103,7 +103,7 @@ OpenNoms.app = {
                         this.queryController.updateLayerWithNewParams(this.appPanel.mapPanel.staticflightlayer);
                         break;
                     case 'animated':
-                        this.queryController.getAniatedFlightData(Ext.getCmp('tabtrackanimator').store);
+                        this.queryController.getAnimatedFlightData();
                         break;
                 }
             },

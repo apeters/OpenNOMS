@@ -140,9 +140,9 @@
                             strokeWidth: 2,
                             strokeOpacity: 1,
                             strokeColor: "#666600",
-			    label: "${altitude}",
-			    labelYOffset: 15,
-			    externalGraphic: OpenNoms.config.URLs.planeIcons + "airplane_blue${heading}.png"
+			                label: "${altitude}",
+			                labelYOffset: 15,
+			                externalGraphic: OpenNoms.config.URLs.planeIcons + "airplane_blue${heading}.png"
                         },
                         "Line": {
                             strokeWidth: 1,

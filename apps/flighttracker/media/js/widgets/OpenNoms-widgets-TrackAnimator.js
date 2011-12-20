@@ -116,6 +116,12 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
     */
     repeat: false,
 
+    /** api: config[playContinuously]
+    *  ``Boolean``
+    *  Keep requesting new records and displosing of old one.  Default is false.
+    */
+    playContinuously: false,
+
     /** api: config[aggressive]
     *  ``Boolean``
     *  Update the display as slider thumb is dragged.  Default is true.  If
@@ -129,6 +135,17 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
     */
     playing: false,
 
+    /** private: method[oldTracks]
+    */
+    oldTracks: [],
+
+    /** private: method[bufferLoading]
+    */
+    bufferLoading: false,
+
+    /** private: method[bufferLength]
+    */
+    bufferLength: 60000,
 
     /** private: method[initComponent]
     */
@@ -149,6 +166,75 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
             "exception"
         );
 
+        this.bufferStore = Ext.create('Ext.data.Store', {
+            fields: this.fields || [
+		            { name: "when", type: "date", dateFormat: 'c' },
+		              { name: "heading", type: "number" },
+		              { name: "altitude", type: "number" },
+                      { name: "speed", type: "number" },
+                      { name: "adflag", type: "string" },
+		              { name: "mactype", type: "string" },
+		              { name: "airline", type: "string" },
+		              { name: "trackId", type: "number", mapping: "opnum" },
+		              { name: "flight_id", type: "string" }
+            ],
+            sortInfo: { field: 'when', direction: 'ASC' },
+            proxy: Ext.create('FGI.data.proxy.GeoserverJsonP', {
+                url: this.url,
+                extraParams: this.extraParams
+            }),
+            autoLoad: false,
+            listeners: {
+                load: function (bufferStore) {
+                    var deadTracks = [];
+                    bufferStore.each(function (rec) {
+                        // parse the track details
+                        var trackdetails = Ext.decode(rec.raw.trackdetails);
+                        if (trackdetails) {
+                            rec.set('when', trackdetails.t);
+                            rec.set('heading', trackdetails.h);
+                            rec.set('altitude', trackdetails.z);
+                            rec.set('speed', trackdetails.s);
+
+                            // create an OL point from the track deatils
+                            var wpt = new OpenLayers.Geometry.Point(trackdetails.x, trackdetails.y);
+                            rec.set('feature', new OpenLayers.Feature.Vector(wpt, rec.data));
+
+                            //                            var when = rec.get('when').valueOf();
+                            //                            if (when < this.startTime) {
+                            //                                this.startTime = when;
+                            //                            } if (when > this.endTime) {
+                            //                                this.endTime = when;
+                            //                            }
+                        } else {
+                            deadTracks.push(rec);
+                        }
+
+                    }, this);
+
+                    bufferStore.remove(deadTracks);
+
+                    this.store.add(bufferStore.data.items, true);
+
+                    this.bufferLoading = false;
+
+                },
+                beforeLoad: function () {
+                    this.endTime = this.endTime + this.bufferLength;
+                    this.slider.maxValue = this.endTime;
+                    var st = new Date();
+                    var et = new Date();
+                    st.setTime(this.endTime - this.bufferLength);
+                    et.setTime(this.endTime);
+                    this.params.isorange = Ext.Date.format(st, 'Y-m-d H\\\\:i\\\\:s') + '/' + Ext.Date.format(et, 'Y-m-d H\\\\:i\\\\:s');
+                    this.extraParams.viewparams = this.formatParamsForGeoserver(this.params);
+                    this.bufferLoading = true;
+                },
+                scope: this
+            }
+        });
+
+
 
         if (!this.store) {
 
@@ -161,6 +247,8 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
 		              { name: "when", type: "date", dateFormat: 'c' },
 		              { name: "heading", type: "number" },
 		              { name: "altitude", type: "number" },
+                      { name: "speed", type: "number" },
+                      { name: "adflag", type: "string" },
 		              { name: "mactype", type: "string" },
 		              { name: "airline", type: "string" },
 		              { name: "trackId", type: "number", mapping: "opnum" },
@@ -174,39 +262,52 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                 autoLoad: false,
                 listeners: {
                     load: function (store) {
-                        this.startTime = Number.POSITIVE_INFINITY;
-                        this.endTime = Number.NEGATIVE_INFINITY;
+                        //                        this.startTime = Number.POSITIVE_INFINITY;
+                        //                        this.endTime = Number.NEGATIVE_INFINITY;
+                        this.playPauseBtn.disable();
+                        var deadTracks = [];
                         store.each(function (rec) {
                             // parse the track details
                             var trackdetails = Ext.decode(rec.raw.trackdetails);
-                            rec.set('when', trackdetails.t);
-                            rec.set('heading', trackdetails.h);
-                            rec.set('altitude', trackdetails.z);
+                            if (trackdetails) {
+                                rec.set('when', trackdetails.t);
+                                rec.set('heading', trackdetails.h);
+                                rec.set('altitude', trackdetails.z);
+                                rec.set('speed', trackdetails.s);
 
-                            // create an OL point from the track deatils
-                            var wpt = new OpenLayers.Geometry.Point(trackdetails.x, trackdetails.y);
-                            rec.set('feature', new OpenLayers.Feature.Vector(wpt, rec.data));
+                                // create an OL point from the track deatils
+                                var wpt = new OpenLayers.Geometry.Point(trackdetails.x, trackdetails.y);
+                                rec.set('feature', new OpenLayers.Feature.Vector(wpt, rec.data));
 
-                            var when = rec.get('when').valueOf();
-                            if (when < this.startTime) {
-                                this.startTime = when;
-                            } if (when > this.endTime) {
-                                this.endTime = when;
+                                //                            var when = rec.get('when').valueOf();
+                                //                            if (when < this.startTime) {
+                                //                                this.startTime = when;
+                                //                            } if (when > this.endTime) {
+                                //                                this.endTime = when;
+                                //                            }
+                            } else {
+                                deadTracks.push(rec);
                             }
+
                         }, this);
-                        if (this.store.getCount() <= 1) {
-                            this.playPauseBtn.disable();
+
+                        store.remove(deadTracks);
+
+                        if (this.store.getCount() <= 1 && !this.playContinuously) {
                             this.updateSliderTip(this.slider, "No Data Available for Selected Date/Time", this.slider.thumbs[0]);
                         } else {
                             this.playPauseBtn.enable();
-                            this.shiftTime = this.endTime - 60000;
                             this.slider.minValue = this.startTime;
                             this.slider.maxValue = this.endTime;
-                            if (this.slider.getValue() < this.startTime || this.slider.getValue() > this.endTime) {
-                                this.slider.setValue(this.startTime);
-                            }
+                            this.slider.setValue(this.startTime, false);
 
                             this.updateDisplay();
+                            if (this.playContinuously) {
+                                this.play();
+                            } else {
+                                // make sure the speed reflects the combo value (speed gets changed programatically for realtime state)
+                                this.speed = this.speedcombo.getValue()
+                            }
                         }
 
                     },
@@ -336,9 +437,19 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                 obj.points.push(feature.geometry);
                 obj.attributes = feature.attributes;
                 //console.log(obj);
+                if (this.playContinuously) {
+                    this.oldTracks.push(rec);
+                }
             }
+
             return include;
         });
+
+        // remove the old tracks to make room for new ones
+        if (this.playContinuously) {
+            this.store.remove(this.oldTracks);
+        }
+
         if (this.layer) {
             this.layer.removeAllFeatures();
             var tracks = [];
@@ -391,6 +502,13 @@ Ext.define('OpenNoms.widgets.TrackAnimator', {
                     }
                 } else {
                     this.slider.setValue(time);
+                    if (this.playContinuously) {
+                        // have to manaully call updateDisplay because slider is not visible and hence not firing events
+                        this.updateDisplay();
+                        if (!this.bufferLoading && (time + 20000) > this.endTime) {
+                            this.bufferStore.load();
+                        }
+                    }
                 }
                 return more;
             }

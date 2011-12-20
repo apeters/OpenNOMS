@@ -700,3 +700,68 @@ $BODY$
   COST 100
   ROWS 1000;
 ALTER FUNCTION opennoms.mac_dumppoints_web2(geometry, timestamp with time zone, integer) OWNER TO postgres;
+
+
+CREATE OR REPLACE FUNCTION track_by_time_period(geometry, timestamp with time zone, timestamp with time zone, timestamp with time zone, timestamp with time zone)
+  RETURNS geometry AS
+$BODY$
+	SELECT
+	CASE WHEN
+	period_cc($2,$3) <@ period_cc($4,$5) THEN $1
+	WHEN
+	period_cc($2,$3) @> period_cc($4,$5) THEN st_locate_between_measures($1,extract(epoch from period_offset(period_cc($2,$3),$4)),extract(epoch from period_offset(period_cc($2,$3),$5)))
+	WHEN
+	period_cc($2,$3) &> period_cc($4,$5) THEN st_locate_between_measures($1,0,extract(epoch from ($5-$2)))
+	WHEN
+	period_cc($2,$3) &< period_cc($4,$5) THEN st_locate_between_measures($1,extract(epoch from ($4-$2)),999999999999999999999)
+	ELSE
+	null
+
+end;$BODY$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ 
+ 
+
+--Using start time end time (not thoroughly tested, hopefully I didn’t get anything backwards):
+-- Function: opennoms.track_by_time(geometry, timestamp with time zone, timestamp with time zone, timestamp with time zone, timestamp with time zone, boolean)
+
+-- DROP FUNCTION opennoms.track_by_time(geometry, timestamp with time zone, timestamp with time zone, timestamp with time zone, timestamp with time zone, boolean);
+
+CREATE OR REPLACE FUNCTION opennoms.track_by_time(geom geometry, trackstime timestamp with time zone, tracketime timestamp with time zone, periodstime timestamp with time zone, periodetime timestamp with time zone, subset boolean)
+  RETURNS geometry AS
+$BODY$
+
+    SELECT
+    CASE
+    -- Subset is set to false or track entirely within period
+    WHEN $6=false OR ($2 >= $4 AND $3 <= $5)
+	    THEN $1
+    -- Track starts before period and ends after period
+    WHEN $2 < $4 AND $3 > $5
+	    THEN st_locate_between_measures(
+			    $1,
+			    extract(epoch from $4-$2),
+			    extract(epoch from $5-$2)
+	    )
+    --track starts during period and ends after period
+    WHEN $2 >= $4 AND $2 <= $5 AND $3 > $5
+	    THEN st_locate_between_measures(
+			    $1,
+			    0,
+			    extract(epoch from $5-$2)
+	    )
+    --track starts before period and ends during period
+    WHEN $2 < $4 AND $3 >= $4 AND $3 <= $5
+	    THEN st_locate_between_measures(
+			    $1,
+			    extract(epoch from $4-$2),
+			    9999999999999999999999
+	    )
+    ELSE NULL
+END;
+
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION opennoms.track_by_time(geometry, timestamp with time zone, timestamp with time zone, timestamp with time zone, timestamp with time zone, boolean) OWNER TO postgres;
