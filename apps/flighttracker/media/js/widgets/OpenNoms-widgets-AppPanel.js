@@ -168,17 +168,17 @@
                         xtype: 'container',
                         html: '<div style="font-weight:bold;">Flight Track Display:</div>' +
                             '​<div id="staticflightlegend">' +
-                                '<img src="Media/images/redline.png" style="padding-left:40px;padding-right:6px;">Arrivals' +
-                                '<img src="Media/images/greenline.png" style="padding-left:40px;padding-right:6px;">Departures' +
-                                '<img src="Media/images/blueline.png" style="padding-left:40px;padding-right:6px;">Untagged' +
+                                '<img src="media/images/redline.png" style="padding-left:40px;padding-right:6px;">Arrivals' +
+                                '<img src="media/images/greenline.png" style="padding-left:40px;padding-right:6px;">Departures' +
+                                '<img src="media/images/blueline.png" style="padding-left:40px;padding-right:6px;">Untagged' +
                             '</div>'
                     }, {
                         xtype: 'container',
                         html: '<div style="font-weight:bold;">Animated Flight Display:</div>' +
                             '​<div id="animatedflightlegend">' +
-                                '<img src="Media/images/airplane_red.png" style="padding-left:40px;padding-right:6px;">Arrivals' +
-                                '<img src="Media/images/airplane_green.png" style="padding-left:40px;padding-right:6px;">Departures' +
-                                '<img src="Media/images/airplane_blue.png" style="padding-left:40px;padding-right:6px;">Untagged' +
+                                '<img src="media/images/airplane_red.png" style="padding-left:40px;padding-right:6px;">Arrivals' +
+                                '<img src="media/images/airplane_green.png" style="padding-left:40px;padding-right:6px;">Departures' +
+                                '<img src="media/images/airplane_blue.png" style="padding-left:40px;padding-right:6px;">Untagged' +
                             '</div>'
                     }],
                     region: 'north'

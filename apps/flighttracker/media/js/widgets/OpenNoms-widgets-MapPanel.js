@@ -293,13 +293,13 @@
 
         var addressSearchStyle = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style({
-                externalGraphic: 'Media/images/SearchResult.png',
+                externalGraphic: 'media/images/SearchResult.png',
                 graphicWidth: 32,
                 graphicHeight: 37,
                 graphicOpacity: 1,
                 graphicXOffset: -16,
                 graphicYOffset: -37,
-                backgroundGraphic: 'Media/images/shadow.png',
+                backgroundGraphic: 'media/images/shadow.png',
                 backgroundXOffset: -16,
                 backgroundYOffset: -37,
                 backgroundHeight: 37,

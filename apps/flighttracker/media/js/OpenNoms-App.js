@@ -157,15 +157,16 @@ OpenNoms.app = {
             },
             'mapclicked': function (e) {
                 var loc = this.appPanel.mapPanel.map.getLonLatFromPixel(e.xy);
-                Ext.Ajax.request({
+                FGI.data.GeoserverJsonP.request({
                     url: OpenNoms.config.URLs.ows,
+                    callbackKey: 'format_options',
                     method: 'GET',
                     params: {
-                        'viewparams': this.queryController.formatParamsForGeoserver() +
-                            'x:' + loc.lon +
-                            ';y:' + loc.lat + ';' +
+                        'viewparams': this.queryController.getAllParams() +
+                        'x:' + loc.lon +
+                        ';y:' + loc.lat + ';' +
                         //TODO: wire up rest of params
-                            'airport:MSP\\,STP\\,FCM\\,NONE;optype:;',
+                        'airport:MSP\\,STP\\,FCM\\,NONE;optype:;',
                         'service': 'WFS',
                         'version': '1.0.0',
                         'request': 'GetFeature',
@@ -173,8 +174,7 @@ OpenNoms.app = {
                         'maxFeatures': '50',
                         'outputFormat': 'json'
                     },
-                    success: function (response) {
-                        var responseObj = Ext.JSON.decode(response.responseText);
+                    success: function (responseObj) {
                         if (responseObj.features.length > 0) {
                             this.appPanel.mapPanel.selectedFlightTrackLayer.removeAllFeatures();
                             var feature = this.appPanel.mapPanel.wktFormat.read(responseObj.features[0].properties.wkt);
